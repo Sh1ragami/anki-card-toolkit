@@ -2,6 +2,10 @@
 
 直近の解答速度と過去のミス率・再出題率から、本日の学習完了時刻および全カード走破までの所要時間を算出するHUDです。
 
+<p align="center">
+  <img src="../../docs/images/forecast-modal.png" alt="Study Forecast Modal Panel" width="300">
+</p>
+
 ## 仕様
 - **予測アルゴリズム**:
   - カード遷移速度（秒/問）をローカルにサンプリングして移動平均を算出。

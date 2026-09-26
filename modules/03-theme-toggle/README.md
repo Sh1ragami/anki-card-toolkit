@@ -2,6 +2,11 @@
 
 グリーン（#B6BDA7）とOLED漆黒ブラック（#000000）を切り替えるテーマトグル。
 
+<p align="center">
+  <img src="../../docs/images/card-overview-green.png" alt="Green Theme" width="48%">
+  <img src="../../docs/images/card-overview-dark.png" alt="OLED Dark Theme" width="48%">
+</p>
+
 ## 仕様
 - **永続化**: `localStorage` を使用し、AnkiMobile / AnkiDroid を含む全環境で状態を保持。
 - **白飛び防止**: テンプレートの先頭行でスタイルをインライン適用することで、カード読み込み時の背景色フラッシュを防止。

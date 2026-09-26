@@ -5,6 +5,17 @@ Ankiカード用のモジュール式UI拡張・学習支援ツールキット�
 
 Anki Desktop、AnkiMobile（iOS）、AnkiDroid（Android）に対応。
 
+<p align="center">
+  <img src="docs/images/card-overview-green.png" alt="Card Overview (Green Theme)" width="48%">
+  <img src="docs/images/card-overview-dark.png" alt="Card Overview (Dark Theme)" width="48%">
+</p>
+
+<p align="center">
+  <img src="docs/images/forecast-modal.png" alt="Study Forecast Modal" width="31%">
+  <img src="docs/images/timer-modal.png" alt="Study Timer Modal" width="31%">
+  <img src="docs/images/clip-modal.png" alt="Saved Words Modal" width="31%">
+</p>
+
 ## モジュール一覧
 
 各機能は独立しており、必要なモジュール単体でも導入可能です。
