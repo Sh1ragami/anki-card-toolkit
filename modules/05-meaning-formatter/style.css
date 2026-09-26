@@ -1,0 +1,4 @@
+.equal-sub { font-size: 0.88em !important; color: #5a6b5d !important; margin-left: 4px !important; }
+.bracket-sub { font-size: 0.85em !important; color: #6b7c6e !important; }
+.theme-dark .equal-sub { color: #949494 !important; }
+.theme-dark .bracket-sub { color: #6e6e6e !important; }

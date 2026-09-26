@@ -1,0 +1,140 @@
+(function() {
+  var KEY_END = 'anki_study_session_end';
+  var KEY_TOTAL = 'anki_study_session_total';
+  var KEY_BAR_MODE = 'anki_bar_mode'; // 'session' or 'card'
+  var DEFAULT_MINS = 25;
+  var CARD_DURATION_MS = 8000;
+  var cardStartTime = Date.now();
+
+  function getBarMode() {
+    try { return localStorage.getItem(KEY_BAR_MODE) || 'session'; } catch(e) { return 'session'; }
+  }
+
+  function setBarMode(mode) {
+    try { localStorage.setItem(KEY_BAR_MODE, mode); } catch(e) {}
+    updateBarModeUI();
+  }
+
+  function updateBarModeUI() {
+    var btn = document.getElementById('hdr-barmode-btn');
+    if (btn) {
+      var mode = getBarMode();
+      btn.textContent = (mode === 'card') ? '📊 表示: ⚡ 1問締め切り (8秒)' : '📊 表示: ⏳ 残り勉強時間 (全体)';
+    }
+  }
+
+  window.toggleBarMode = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var cur = getBarMode();
+    var next = (cur === 'card') ? 'session' : 'card';
+    setBarMode(next);
+    return false;
+  };
+
+  function initSession() {
+    var now = Date.now();
+    var endTime = parseInt(localStorage.getItem(KEY_END) || '0', 10);
+    var totalMs = parseInt(localStorage.getItem(KEY_TOTAL) || '0', 10);
+
+    if (!endTime || now - endTime > 3600000) {
+      totalMs = DEFAULT_MINS * 60 * 1000;
+      endTime = now + totalMs;
+      localStorage.setItem(KEY_END, endTime.toString());
+      localStorage.setItem(KEY_TOTAL, totalMs.toString());
+    }
+    return { endTime: endTime, totalMs: totalMs };
+  }
+
+  var session = initSession();
+
+  function formatMinSec(sec) {
+    if (sec <= 0) return '00:00';
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function setBarProgress(ratio) {
+    var bar = document.getElementById('screen-bottom-bar-fill');
+    if (!bar) return;
+    var clampedRatio = Math.max(0, Math.min(1, ratio));
+    var pct = (clampedRatio * 100).toFixed(2);
+    var clip = 'inset(0 ' + (100 - pct) + '% 0 0)';
+    bar.style.clipPath = clip;
+    bar.style.webkitClipPath = clip;
+  }
+
+  function tick() {
+    var now = Date.now();
+    var mode = getBarMode();
+
+    var remainingMs = session.endTime - now;
+    var remainingSec = Math.max(0, Math.ceil(remainingMs / 1000));
+
+    var textEl = document.getElementById('bottom-time-display');
+    if (textEl) {
+      textEl.textContent = (remainingSec <= 0) ? '00:00' : formatMinSec(remainingSec);
+    }
+
+    if (mode === 'card') {
+      var elapsed = now - cardStartTime;
+      var cardRemaining = Math.max(0, CARD_DURATION_MS - elapsed);
+      setBarProgress(cardRemaining / CARD_DURATION_MS);
+    } else {
+      var sessionRatio = session.totalMs > 0 ? (remainingMs / session.totalMs) : 0;
+      setBarProgress(sessionRatio);
+    }
+  }
+
+  tick();
+  updateBarModeUI();
+
+  function loop() {
+    tick();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  window.toggleSessionMenu = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var menu = document.getElementById('hdr-timer-panel');
+    if (!menu) return false;
+    updateBarModeUI();
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    return false;
+  };
+
+  window.startStudySession = function(mins, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var totalMs = mins * 60 * 1000;
+    session.totalMs = totalMs;
+    session.endTime = Date.now() + totalMs;
+    localStorage.setItem(KEY_END, session.endTime.toString());
+    localStorage.setItem(KEY_TOTAL, totalMs.toString());
+    tick();
+    var menu = document.getElementById('hdr-timer-panel');
+    if (menu) menu.style.display = 'none';
+    return false;
+  };
+
+  window.resetStudySession = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    localStorage.removeItem(KEY_END);
+    localStorage.removeItem(KEY_TOTAL);
+    session = initSession();
+    tick();
+    var menu = document.getElementById('hdr-timer-panel');
+    if (menu) menu.style.display = 'none';
+    return false;
+  };
+
+  document.addEventListener('click', function(e) {
+    var timerPanel = document.getElementById('hdr-timer-panel');
+    var timeDisplay = document.getElementById('bottom-time-display');
+    if (timerPanel && timerPanel.style.display === 'block') {
+      if (!timerPanel.contains(e.target) && (!timeDisplay || !timeDisplay.contains(e.target))) {
+        timerPanel.style.display = 'none';
+      }
+    }
+  });
+})();

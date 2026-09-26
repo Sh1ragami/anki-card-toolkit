@@ -1,0 +1,15 @@
+// collection.media フォルダに _deck_forecast.js として保存します
+window.__ANKI_FORECAST_DATA__ = {
+  "updatedAt": Date.now(),
+  "decks": {
+    "all": {
+      "name": "究極の英単語 (全Part全体)",
+      "newCount": 6766,
+      "revCount": 3231,
+      "lrnCount": 57,
+      "todayTotal": 10054,
+      "deckRemaining": 27525,
+      "totalCards": 27924
+    }
+  }
+};

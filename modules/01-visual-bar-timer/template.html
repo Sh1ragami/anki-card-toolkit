@@ -1,0 +1,61 @@
+<!-- Screen Bottom HUD: King Jim VBT20 4-Color Gradient Bar + Instant Sync -->
+<div id="screen-bottom-hud">
+  <div id="bottom-time-display" onclick="window.toggleSessionMenu(event)" title="タップでタイマー設定">25:00</div>
+  <div id="screen-bottom-bar-track">
+    <div id="screen-bottom-bar-fill"></div>
+    <div id="screen-bottom-bar-ticks">
+      <div></div><div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div><div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Timer Setting Dropdown Panel -->
+<div class="hdr-dropdown-panel" id="hdr-timer-panel" onclick="event.stopPropagation()">
+  <div class="dropdown-header">
+    <span>STUDY TIMER</span>
+  </div>
+  <button type="button" class="timer-menu-btn" onclick="window.startStudySession(15, event)">⚡ 15 分集中</button>
+  <button type="button" class="timer-menu-btn" onclick="window.startStudySession(25, event)">🍅 25 分 (ポモドーロ)</button>
+  <button type="button" class="timer-menu-btn" onclick="window.startStudySession(45, event)">🎯 45 分集中</button>
+  <button type="button" class="timer-menu-btn" onclick="window.startStudySession(60, event)">🔥 60 分集中</button>
+  <button type="button" class="timer-menu-btn" id="hdr-barmode-btn" onclick="window.toggleBarMode(event)" style="border-top: 1px dashed rgba(72, 89, 75, 0.3); margin-top: 4px; padding-top: 6px;">📊 表示: ⏳ 残り勉強時間</button>
+  <button type="button" class="timer-menu-btn reset" onclick="window.resetStudySession(event)">🔄 タイマーリセット</button>
+</div>
+
+<script>
+/* Synchronous Instant Paint - Eliminates any card-flip flickering */
+(function() {
+  try {
+    var endTime = parseInt(localStorage.getItem('anki_study_session_end') || '0', 10);
+    var totalMs = parseInt(localStorage.getItem('anki_study_session_total') || '1500000', 10);
+    var mode = localStorage.getItem('anki_bar_mode') || 'session';
+    var now = Date.now();
+    var remMs = Math.max(0, endTime - now);
+    var remSec = Math.ceil(remMs / 1000);
+    var m = Math.floor(remSec / 60);
+    var s = remSec % 60;
+    var timeStr = (remSec <= 0) ? '00:00' : ((m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s);
+
+    var ratio = 0;
+    if (mode === 'card') {
+      ratio = 1;
+    } else {
+      ratio = totalMs > 0 ? (remMs / totalMs) : 0;
+    }
+    var pct = (Math.max(0, Math.min(1, ratio)) * 100).toFixed(2);
+
+    var tEl = document.getElementById('bottom-time-display');
+    if (tEl) tEl.textContent = timeStr;
+
+    var fEl = document.getElementById('screen-bottom-bar-fill');
+    if (fEl) {
+      var clip = 'inset(0 ' + (100 - pct) + '% 0 0)';
+      fEl.style.clipPath = clip;
+      fEl.style.webkitClipPath = clip;
+    }
+  } catch(e) {}
+})();
+</script>

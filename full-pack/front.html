@@ -1,0 +1,877 @@
+<script src="_deck_forecast.js"></script>
+<style id="custom-theme-style"></style>
+<script>
+(function() {
+  var isDark = false;
+  try {
+    isDark = (localStorage.getItem('anki_theme_preference') === 'dark');
+  } catch(e) {}
+  if (isDark) {
+    document.documentElement.classList.add('theme-dark');
+    document.body && document.body.classList.add('theme-dark');
+    var st = document.getElementById('custom-theme-style');
+    if (st) st.textContent = `html, body, #qa, .card, .card-box { background-color: #000000 !important; color: #e5e5e5 !important; }\n.phrase-en, .word-text-overlay, .word-text-plain, .meaning-block, .meaning-item { color: #f2f2f2 !important; }\n.phrase-ja { color: #cccccc !important; }\n.target-word, .phrase-ja .target-word-ja { color: #ff5555 !important; }\n.header-bar, .word-no, .badge-level, .phonetic, .sound-btn { color: #888888 !important; }\n.sound-btn:hover, .sound-btn:active { color: #ff5555 !important; }\n.clean-divider { background: #262626 !important; }\n.pos-tag { background-color: #222222 !important; color: #ffffff !important; border: 1px solid #444444 !important; }\n.extra-info { color: #888888 !important; border-top-color: #262626 !important; }\n.equal-sub, .card-box .meaning-block .equal-sub { color: #949494 !important; }\n.bracket-sub, .card-box .meaning-block .bracket-sub { color: #6e6e6e !important; }\n.sub-meaning { color: #949494 !important; }\n.sub-meaning::before { color: #f2f2f2 !important; }\n#bottom-prediction-display { color: #a3a3a3 !important; }\n#bottom-prediction-display:hover { color: #ffffff !important; }\n#bottom-time-display { color: #a3a3a3 !important; }\n#screen-bottom-bar-track { background: rgba(255, 255, 255, 0.15) !important; }\n#screen-bottom-bar-ticks div { border-right-color: #000000 !important; }\n#hdr-prediction-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #e5e5e5 !important; }\n.fc-tab-btn { background: rgba(255, 255, 255, 0.08) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #a3a3a3 !important; }\n.fc-tab-btn.active { background: #ff5555 !important; color: #ffffff !important; border-color: #ff5555 !important; }\n.fc-scope-btn { background: rgba(255, 255, 255, 0.06) !important; border-color: rgba(255, 255, 255, 0.15) !important; color: #a3a3a3 !important; }\n.fc-scope-btn.active { background: #ff5555 !important; color: #ffffff !important; border-color: #ff5555 !important; }\n.forecast-label { color: #888888 !important; }\n.forecast-val { color: #f2f2f2 !important; }\n.forecast-val.highlight { color: #ff5555 !important; }\n.forecast-subnote { color: #666666 !important; }\n#fc-breakdown { color: #888888 !important; }\n.hdr-dropdown-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; }`;
+  }
+})();
+</script>
+<div class="card-box">
+  <div class="header-bar">
+    <div class="header-left">
+      <span class="word-no">□ {{Word_No}}</span>
+    </div>
+
+    <div class="header-right">
+      <span class="badge-level">{{Level}}</span>
+      <button type="button" class="emoji-btn" id="hdr-clip-btn" onclick="window.handleClipClick(event)" title="単語保存 (タップで保存 / 済なら一覧)">📎</button>
+      <button type="button" class="emoji-btn" id="hdr-theme-btn" onclick="window.toggleCardTheme(event)" title="テーマ切替">🌙</button>
+    </div>
+  </div>
+
+  <!-- Saved Words Dropdown Panel -->
+  <div class="hdr-dropdown-panel" id="hdr-stock-panel" onclick="event.stopPropagation()">
+    <div class="dropdown-header">
+      <span>SAVED WORDS</span>
+      <div class="dropdown-btn-group">
+        <button type="button" class="dropdown-action-btn copy" id="hdr-copy-btn" onclick="window.copyStockList(event)">📋 COPY</button>
+        <button type="button" class="dropdown-action-btn clear" onclick="window.clearStockList(event)">CLEAR</button>
+      </div>
+    </div>
+    <ul class="stock-ul" id="hdr-stock-ul"></ul>
+  </div>
+
+  <!-- Timer Setting Dropdown Panel -->
+  <div class="hdr-dropdown-panel" id="hdr-timer-panel" onclick="event.stopPropagation()">
+    <div class="dropdown-header">
+      <span>STUDY TIMER</span>
+    </div>
+    <button type="button" class="timer-menu-btn" onclick="window.startStudySession(15, event)">⚡ 15 分集中</button>
+    <button type="button" class="timer-menu-btn" onclick="window.startStudySession(25, event)">🍅 25 分 (ポモドーロ)</button>
+    <button type="button" class="timer-menu-btn" onclick="window.startStudySession(45, event)">🎯 45 分集中</button>
+    <button type="button" class="timer-menu-btn" onclick="window.startStudySession(60, event)">🔥 60 分集中</button>
+    <button type="button" class="timer-menu-btn" id="hdr-barmode-btn" onclick="window.toggleBarMode(event)" style="border-top: 1px dashed rgba(72, 89, 75, 0.3); margin-top: 4px; padding-top: 6px;">📊 表示: ⏳ 残り勉強時間</button>
+    <button type="button" class="timer-menu-btn reset" onclick="window.resetStudySession(event)">🔄 タイマーリセット</button>
+  </div>
+
+  <!-- Prediction Detail Dropdown Panel (Study Forecast) -->
+  <div class="hdr-dropdown-panel" id="hdr-prediction-panel" onclick="event.stopPropagation()">
+    <div class="dropdown-header">
+      <span>STUDY FORECAST</span>
+      <button type="button" class="dropdown-action-btn" onclick="window.resetSessionReviewed(event)" style="font-size:11px;">🔄 リセット</button>
+    </div>
+    <div class="forecast-mode-tabs">
+      <button type="button" class="fc-tab-btn active" id="fc-tab-today" onclick="window.setForecastMode('today', event)">📅 本日の学習分</button>
+      <button type="button" class="fc-tab-btn" id="fc-tab-deck" onclick="window.setForecastMode('all_cards', event)">📚 全カード完走</button>
+    </div>
+    <div class="forecast-scope-bar">
+      <span style="font-size:10px; color:#6d7d6f;">範囲:</span>
+      <button type="button" class="fc-scope-btn active" id="fc-scope-all" onclick="window.setForecastScope('all', event)">🌍 全体 (2.8万枚)</button>
+      <button type="button" class="fc-scope-btn" id="fc-scope-part" onclick="window.setForecastScope('part', event)">📖 このPartのみ</button>
+    </div>
+    <div class="forecast-content">
+      <div class="forecast-row"><span class="forecast-label">完了予定:</span> <span class="forecast-val highlight" id="fc-finish-time">--:--</span></div>
+      <div class="forecast-row"><span class="forecast-label">残り所要時間:</span> <span class="forecast-val" id="fc-remain-time">--分</span></div>
+      <div class="forecast-row"><span class="forecast-label">残り対象枚数:</span> <span class="forecast-val" id="fc-due-cards">--枚</span></div>
+      <div id="fc-breakdown" style="font-size:10px; color:#6d7d6f; margin-bottom:4px; text-align:right;"></div>
+      <div class="forecast-row"><span class="forecast-label">実質解答予測:</span> <span class="forecast-val" id="fc-actual-reviews">約--回</span></div>
+      <div class="forecast-subnote">※ミス・再出題率(約46%)を加味して計算</div>
+      <div class="forecast-row" style="margin-top:6px; border-top:1px dashed rgba(72,89,75,0.25); padding-top:6px;"><span class="forecast-label">直近ペース:</span> <span class="forecast-val" id="fc-pace">--秒/問</span></div>
+    </div>
+  </div>
+  {{#Example_Audio}}
+  <div style="display:none;">[sound:{{Example_Audio}}]</div>
+  {{/Example_Audio}}
+
+  <div class="phrase-section">
+    {{#Example_EN}}
+    <div class="phrase-en">
+      {{Example_EN}}
+      {{#Example_Audio}}
+      <span class="sound-btn-wrapper">
+        <button type="button" class="sound-btn" onclick="playExampleAudio('{{Example_Audio}}'); return false;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        </button>
+      </span>
+      {{/Example_Audio}}
+    </div>
+    {{/Example_EN}}
+    {{^Example_EN}}
+    <div class="phrase-en">
+      {{Word}}
+    </div>
+    {{/Example_EN}}
+  </div>
+</div>
+
+<!-- Screen Bottom HUD: Forecast + Timer + King Jim VBT20 4-Color Gradient Bar -->
+<div id="screen-bottom-hud">
+  <div id="bottom-info-row">
+    <div id="bottom-prediction-display" onclick="window.togglePredictionPanel(event)" title="タップで学習完了予測の詳細・モード切替">🏁 予測: 計算中...</div>
+    <div id="bottom-time-display" onclick="window.toggleSessionMenu(event)" title="タップでタイマー設定"></div>
+  </div>
+  <div id="screen-bottom-bar-track">
+    <div id="screen-bottom-bar-fill"></div>
+    <div id="screen-bottom-bar-ticks">
+      <div></div><div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div><div></div>
+      <div></div><div></div><div></div><div></div><div></div>
+    </div>
+  </div>
+</div>
+<script>
+/* Synchronous Instant Paint - Eliminates any card-flip flickering */
+(function() {
+  try {
+    var endTime = parseInt(localStorage.getItem('anki_study_session_end') || '0', 10);
+    var totalMs = parseInt(localStorage.getItem('anki_study_session_total') || '1500000', 10);
+    var mode = localStorage.getItem('anki_bar_mode') || 'session';
+    var now = Date.now();
+    var remMs = Math.max(0, endTime - now);
+    var remSec = Math.ceil(remMs / 1000);
+    var m = Math.floor(remSec / 60);
+    var s = remSec % 60;
+    var timeStr = (remSec <= 0) ? '00:00' : ((m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s);
+
+    var ratio = 0;
+    if (mode === 'card') {
+      ratio = 1;
+    } else {
+      ratio = totalMs > 0 ? (remMs / totalMs) : 0;
+    }
+    var pct = (Math.max(0, Math.min(1, ratio)) * 100).toFixed(2);
+
+    var tEl = document.getElementById('bottom-time-display');
+    if (tEl) tEl.textContent = timeStr;
+
+    var fEl = document.getElementById('screen-bottom-bar-fill');
+    if (fEl) {
+      var clip = 'inset(0 ' + (100 - pct) + '% 0 0)';
+      fEl.style.clipPath = clip;
+      fEl.style.webkitClipPath = clip;
+    }
+  } catch(e) {}
+})();
+</script>
+<script>
+if (typeof playExampleAudio === 'undefined') {
+  function playExampleAudio(file) {
+    if (!file) return false;
+    if (file.indexOf('[' + 'sound:') === 0) {
+      file = file.substring(7, file.length - 1).trim();
+    }
+    file = file.trim();
+    try {
+      var a1 = new Audio('_media/' + file);
+      var p1 = a1.play();
+      if (p1 !== undefined) {
+        p1.catch(function() {
+          try {
+            var a2 = new Audio(file);
+            a2.play().catch(function() {
+              if (window.AnkiDroidJS) { AnkiDroidJS.playSound(file); }
+              else if (window.tawa) { tawa.play(file); }
+              else { window.location.href = 'playsound:' + file; }
+            });
+          } catch(e2) {
+            if (window.AnkiDroidJS) { AnkiDroidJS.playSound(file); }
+            else { window.location.href = 'playsound:' + file; }
+          }
+        });
+      }
+    } catch(e) {
+      try {
+        var a2 = new Audio(file);
+        a2.play();
+      } catch(e3) {
+        if (window.AnkiDroidJS) { AnkiDroidJS.playSound(file); }
+        else { window.location.href = 'playsound:' + file; }
+      }
+    }
+    return false;
+  }
+}
+</script>
+<script>
+(function() {
+  /* ============================================================
+     1. Theme Toggle System
+     ============================================================ */
+  var darkCss = `html, body, #qa, .card, .card-box { background-color: #000000 !important; color: #e5e5e5 !important; }\n.phrase-en, .word-text-overlay, .word-text-plain, .meaning-block, .meaning-item { color: #f2f2f2 !important; }\n.phrase-ja { color: #cccccc !important; }\n.target-word, .phrase-ja .target-word-ja { color: #ff5555 !important; }\n.header-bar, .word-no, .badge-level, .phonetic, .sound-btn { color: #888888 !important; }\n.sound-btn:hover, .sound-btn:active { color: #ff5555 !important; }\n.clean-divider { background: #262626 !important; }\n.pos-tag { background-color: #222222 !important; color: #ffffff !important; border: 1px solid #444444 !important; }\n.extra-info { color: #888888 !important; border-top-color: #262626 !important; }\n.equal-sub, .card-box .meaning-block .equal-sub { color: #949494 !important; }\n.bracket-sub, .card-box .meaning-block .bracket-sub { color: #6e6e6e !important; }\n.sub-meaning { color: #949494 !important; }\n.sub-meaning::before { color: #f2f2f2 !important; }\n#bottom-prediction-display { color: #a3a3a3 !important; }\n#bottom-prediction-display:hover { color: #ffffff !important; }\n#bottom-time-display { color: #a3a3a3 !important; }\n#screen-bottom-bar-track { background: rgba(255, 255, 255, 0.15) !important; }\n#screen-bottom-bar-ticks div { border-right-color: #000000 !important; }\n#hdr-prediction-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #e5e5e5 !important; }\n.fc-tab-btn { background: rgba(255, 255, 255, 0.08) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #a3a3a3 !important; }\n.fc-tab-btn.active { background: #ff5555 !important; color: #ffffff !important; border-color: #ff5555 !important; }\n.fc-scope-btn { background: rgba(255, 255, 255, 0.06) !important; border-color: rgba(255, 255, 255, 0.15) !important; color: #a3a3a3 !important; }\n.fc-scope-btn.active { background: #ff5555 !important; color: #ffffff !important; border-color: #ff5555 !important; }\n.forecast-label { color: #888888 !important; }\n.forecast-val { color: #f2f2f2 !important; }\n.forecast-val.highlight { color: #ff5555 !important; }\n.forecast-subnote { color: #666666 !important; }\n#fc-breakdown { color: #888888 !important; }\n.hdr-dropdown-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; }`;
+
+  function getTheme() {
+    try {
+      return localStorage.getItem('anki_theme_preference') || 'green';
+    } catch(e) {
+      return window.__anki_theme_preference || 'green';
+    }
+  }
+
+  function setTheme(theme) {
+    try {
+      localStorage.setItem('anki_theme_preference', theme);
+    } catch(e) {}
+    window.__anki_theme_preference = theme;
+  }
+
+  function applyThemeDisplay(theme) {
+    var isDark = (theme === 'dark');
+    var styleTag = document.getElementById('custom-theme-style');
+    if (!styleTag) {
+      styleTag = document.createElement('style');
+      styleTag.id = 'custom-theme-style';
+      document.head.appendChild(styleTag);
+    }
+    styleTag.textContent = isDark ? darkCss : '';
+
+    if (isDark) {
+      document.body.classList.add('theme-dark');
+      document.documentElement.classList.add('theme-dark');
+    } else {
+      document.body.classList.remove('theme-dark');
+      document.documentElement.classList.remove('theme-dark');
+    }
+
+    var icon = document.getElementById('hdr-theme-btn');
+    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+  }
+
+  applyThemeDisplay(getTheme());
+
+  window.toggleCardTheme = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var cur = getTheme();
+    var next = (cur === 'dark') ? 'green' : 'dark';
+    setTheme(next);
+    applyThemeDisplay(next);
+    return false;
+  };
+
+  /* ============================================================
+     2. Study Session Timer & Screen Bottom Progress Bar
+     ============================================================ */
+  var KEY_END = 'anki_study_session_end';
+  var KEY_TOTAL = 'anki_study_session_total';
+  var KEY_BAR_MODE = 'anki_bar_mode'; // 'session' or 'card'
+  var DEFAULT_MINS = 25;
+  var CARD_DURATION_MS = 8000;
+  var cardStartTime = Date.now();
+
+  function getBarMode() {
+    try {
+      return localStorage.getItem(KEY_BAR_MODE) || 'session';
+    } catch(e) {
+      return 'session';
+    }
+  }
+
+  function setBarMode(mode) {
+    try {
+      localStorage.setItem(KEY_BAR_MODE, mode);
+    } catch(e) {}
+    updateBarModeUI();
+  }
+
+  function updateBarModeUI() {
+    var btn = document.getElementById('hdr-barmode-btn');
+    if (btn) {
+      var mode = getBarMode();
+      btn.textContent = (mode === 'card') ? '📊 表示: ⚡ 1問締め切り (8秒)' : '📊 表示: ⏳ 残り勉強時間 (全体)';
+    }
+  }
+
+  window.toggleBarMode = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var cur = getBarMode();
+    var next = (cur === 'card') ? 'session' : 'card';
+    setBarMode(next);
+    return false;
+  };
+
+  function initSession() {
+    var now = Date.now();
+    var endTime = parseInt(localStorage.getItem(KEY_END) || '0', 10);
+    var totalMs = parseInt(localStorage.getItem(KEY_TOTAL) || '0', 10);
+
+    if (!endTime || now - endTime > 3600000) {
+      totalMs = DEFAULT_MINS * 60 * 1000;
+      endTime = now + totalMs;
+      localStorage.setItem(KEY_END, endTime.toString());
+      localStorage.setItem(KEY_TOTAL, totalMs.toString());
+    }
+    return { endTime: endTime, totalMs: totalMs };
+  }
+
+  var session = initSession();
+
+  function formatMinSec(sec) {
+    if (sec <= 0) return '00:00';
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function setBarProgress(ratio) {
+    var bar = document.getElementById('screen-bottom-bar-fill');
+    if (!bar) return;
+    var clampedRatio = Math.max(0, Math.min(1, ratio));
+    var pct = (clampedRatio * 100).toFixed(2);
+    var clip = 'inset(0 ' + (100 - pct) + '% 0 0)';
+    bar.style.clipPath = clip;
+    bar.style.webkitClipPath = clip;
+  }
+
+  function tick() {
+    var now = Date.now();
+    var mode = getBarMode();
+
+    // 1. Session Countdown Text
+    var remainingMs = session.endTime - now;
+    var remainingSec = Math.max(0, Math.ceil(remainingMs / 1000));
+
+    var textEl = document.getElementById('bottom-time-display');
+    if (textEl) {
+      if (remainingSec <= 0) {
+        textEl.textContent = '00:00';
+      } else {
+        textEl.textContent = formatMinSec(remainingSec);
+      }
+    }
+
+    // 2. Bottom Progress Bar
+    if (mode === 'card') {
+      var elapsed = now - cardStartTime;
+      var cardRemaining = Math.max(0, CARD_DURATION_MS - elapsed);
+      setBarProgress(cardRemaining / CARD_DURATION_MS);
+    } else {
+      var sessionRatio = session.totalMs > 0 ? (remainingMs / session.totalMs) : 0;
+      setBarProgress(sessionRatio);
+    }
+  }
+
+  tick();
+  updateBarModeUI();
+
+  function loop() {
+    tick();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  window.toggleSessionMenu = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var menu = document.getElementById('hdr-timer-panel');
+    var stockPanel = document.getElementById('hdr-stock-panel');
+    var predPanel = document.getElementById('hdr-prediction-panel');
+    if (stockPanel) stockPanel.style.display = 'none';
+    if (predPanel) predPanel.style.display = 'none';
+    if (!menu) return false;
+    updateBarModeUI();
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    return false;
+  };
+
+  window.startStudySession = function(mins, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var totalMs = mins * 60 * 1000;
+    session.totalMs = totalMs;
+    session.endTime = Date.now() + totalMs;
+    localStorage.setItem(KEY_END, session.endTime.toString());
+    localStorage.setItem(KEY_TOTAL, totalMs.toString());
+    tick();
+    var menu = document.getElementById('hdr-timer-panel');
+    if (menu) menu.style.display = 'none';
+    return false;
+  };
+
+  window.resetStudySession = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    localStorage.removeItem(KEY_END);
+    localStorage.removeItem(KEY_TOTAL);
+    session = initSession();
+    tick();
+    var menu = document.getElementById('hdr-timer-panel');
+    if (menu) menu.style.display = 'none';
+    return false;
+  };
+
+  /* ============================================================
+     3. Word Clip & Stock Panel System
+     ============================================================ */
+  var CURRENT_WORD_NO = "{{Word_No}}".trim();
+  var CURRENT_WORD = "{{Word}}".replace(/<[^>]*>/g, '').trim();
+  var KEY_POCKET = 'anki_pocket_list';
+
+  function getStockList() {
+    try {
+      return JSON.parse(localStorage.getItem(KEY_POCKET) || '[]');
+    } catch(e) {
+      return [];
+    }
+  }
+
+  function setStockList(list) {
+    try {
+      localStorage.setItem(KEY_POCKET, JSON.stringify(list));
+    } catch(e) {}
+  }
+
+  window.handleClipClick = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var itemStr = CURRENT_WORD_NO + ' ' + CURRENT_WORD;
+    var list = getStockList();
+    var btn = document.getElementById('hdr-clip-btn');
+
+    if (!list.includes(itemStr)) {
+      list.push(itemStr);
+      setStockList(list);
+      if (btn) {
+        btn.textContent = '✅';
+        setTimeout(function() { btn.textContent = '📎'; }, 800);
+      }
+    } else {
+      window.toggleStockPanel(e);
+    }
+    return false;
+  };
+
+  window.toggleStockPanel = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var panel = document.getElementById('hdr-stock-panel');
+    var timerPanel = document.getElementById('hdr-timer-panel');
+    var predPanel = document.getElementById('hdr-prediction-panel');
+    if (timerPanel) timerPanel.style.display = 'none';
+    if (predPanel) predPanel.style.display = 'none';
+    if (!panel) return false;
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+    } else {
+      renderStockPanel();
+      panel.style.display = 'block';
+    }
+    return false;
+  };
+
+  function renderStockPanel() {
+    var ul = document.getElementById('hdr-stock-ul');
+    if (!ul) return;
+    var list = getStockList();
+    if (list.length === 0) {
+      ul.innerHTML = '<li class="stock-empty">保存された単語はありません</li>';
+      return;
+    }
+    ul.innerHTML = list.map(function(item, idx) {
+      return '<li class="stock-item">' +
+        '<span>' + item + '</span>' +
+        '<button type="button" class="stock-item-del" onclick="window.deleteStockItem(event, ' + idx + ')">×</button>' +
+      '</li>';
+    }).join('');
+  }
+
+  window.deleteStockItem = function(e, idx) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var list = getStockList();
+    if (idx >= 0 && idx < list.length) {
+      list.splice(idx, 1);
+      setStockList(list);
+      renderStockPanel();
+    }
+    return false;
+  };
+
+  window.clearStockList = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    if (confirm('保存した単語リストをすべて削除しますか？')) {
+      setStockList([]);
+      renderStockPanel();
+    }
+    return false;
+  };
+
+  window.copyStockList = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var list = getStockList();
+    if (list.length === 0) return false;
+    var text = list.join('\n');
+    var btn = document.getElementById('hdr-copy-btn');
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        if (btn) btn.textContent = 'COPIED!';
+        setTimeout(function() { if (btn) btn.textContent = '📋 COPY'; }, 1000);
+      });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      if (btn) btn.textContent = 'COPIED!';
+      setTimeout(function() { if (btn) btn.textContent = '📋 COPY'; }, 1000);
+    }
+    return false;
+  };
+
+  /* ============================================================
+     4. Forecast Logic (Integrated from other agy)
+     ============================================================ */
+  window.togglePredictionPanel = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var panel = document.getElementById('hdr-prediction-panel');
+    var timerPanel = document.getElementById('hdr-timer-panel');
+    var stockPanel = document.getElementById('hdr-stock-panel');
+    if (timerPanel) timerPanel.style.display = 'none';
+    if (stockPanel) stockPanel.style.display = 'none';
+    if (!panel) return false;
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+    } else {
+      try { updatePredictionUI(); } catch(err) {}
+      panel.style.display = 'block';
+    }
+    return false;
+  };
+
+  window.setForecastMode = function(mode, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    try {
+      localStorage.setItem('anki_forecast_mode', mode);
+      updatePredictionUI();
+    } catch(err) {}
+    return false;
+  };
+
+  window.setForecastScope = function(scope, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    try {
+      localStorage.setItem('anki_forecast_scope', scope);
+      updatePredictionUI();
+    } catch(err) {}
+    return false;
+  };
+
+  /* ============================================================
+     4. Dual-Mode Study Completion Forecast (Safe & NaN-Proof)
+     ============================================================ */
+  var CURRENT_PART = "{{Part}}".replace(/<[^>]*>/g, '').trim();
+  var KEY_FC_MODE = 'anki_forecast_mode'; // 'today' or 'all_cards'
+  var KEY_FC_SCOPE = 'anki_forecast_scope'; // 'all' (default: 27924 cards) or 'part'
+  var KEY_FC_TIMES = 'anki_forecast_recent_times';
+  var KEY_CARD_LOAD = 'anki_last_card_load_ts';
+  var KEY_CARD_DEC = 'anki_last_card_dec_ts';
+
+  var BASELINE_AGAIN_RATE = 0.458;
+  var BASELINE_GOOD_SEC = 3.78;
+  var BASELINE_AGAIN_SEC = 5.13;
+  var BASELINE_FLIP_SEC = 4.40;
+  var BASE_MULTIPLIER = 1 / (1 - BASELINE_AGAIN_RATE); // ~1.845
+  var BASE_EXPECTED_SEC_PER_CARD = BASELINE_GOOD_SEC + (BASELINE_AGAIN_RATE / (1 - BASELINE_AGAIN_RATE)) * BASELINE_AGAIN_SEC; // ~8.11s
+
+  function toSafeNum(val, defaultVal) {
+    if (typeof val === 'number' && !isNaN(val)) return val;
+    var n = parseInt(val, 10);
+    return (isNaN(n)) ? (defaultVal || 0) : n;
+  }
+
+  function formatNum(val) {
+    return toSafeNum(val, 0).toLocaleString();
+  }
+
+  function getForecastMode() {
+    try {
+      return localStorage.getItem(KEY_FC_MODE) || 'today';
+    } catch(e) {
+      return 'today';
+    }
+  }
+
+  function getForecastScope() {
+    try {
+      return localStorage.getItem(KEY_FC_SCOPE) || 'all';
+    } catch(e) {
+      return 'all';
+    }
+  }
+
+  function getDeckData() {
+    var scope = getForecastScope();
+    var fData = (typeof window.__ANKI_FORECAST_DATA__ !== 'undefined' && window.__ANKI_FORECAST_DATA__.decks) ? window.__ANKI_FORECAST_DATA__.decks : null;
+    var raw = null;
+
+    if (fData) {
+      if (scope === 'part' && fData[CURRENT_PART]) {
+        raw = fData[CURRENT_PART];
+      } else if (fData['all']) {
+        raw = fData['all'];
+      }
+    }
+
+    if (scope === 'part') {
+      var pNew = toSafeNum(raw && raw.newCount, 3956);
+      var pRev = toSafeNum(raw && raw.revCount, 3205);
+      var pLrn = toSafeNum(raw && raw.lrnCount, 57);
+      return {
+        name: CURRENT_PART,
+        newCount: pNew,
+        revCount: pRev,
+        lrnCount: pLrn,
+        todayTotal: (pNew + pRev + pLrn),
+        deckRemaining: toSafeNum(raw && raw.deckRemaining, 7218),
+        totalCards: toSafeNum(raw && (raw.totalCards || raw.total), 7613)
+      };
+    }
+
+    // Default 'all'
+    var aNew = toSafeNum(raw && raw.newCount, 6766);
+    var aRev = toSafeNum(raw && raw.revCount, 3231);
+    var aLrn = toSafeNum(raw && raw.lrnCount, 57);
+    return {
+      name: '究極の英単語 (全Part)',
+      newCount: aNew,
+      revCount: aRev,
+      lrnCount: aLrn,
+      todayTotal: (aNew + aRev + aLrn),
+      deckRemaining: toSafeNum(raw && raw.deckRemaining, 27525),
+      totalCards: toSafeNum(raw && (raw.totalCards || raw.total), 27924)
+    };
+  }
+
+  function getCurrentDueCount() {
+    var mode = getForecastMode();
+    var data = getDeckData();
+
+    var base = (mode === 'all_cards') ? data.deckRemaining : data.todayTotal;
+    var baseNum = toSafeNum(base, (mode === 'all_cards') ? 27525 : 10054);
+
+    var sessionKey = 'anki_session_reviewed_cards';
+    var reviewed = 0;
+    try {
+      reviewed = toSafeNum(localStorage.getItem(sessionKey), 0);
+    } catch(e) {}
+
+    return Math.max(0, baseNum - reviewed);
+  }
+
+  function recordCardPacing() {
+    var now = Date.now();
+    var lastLoad = 0;
+    try {
+      lastLoad = toSafeNum(localStorage.getItem(KEY_CARD_LOAD), 0);
+      localStorage.setItem(KEY_CARD_LOAD, now.toString());
+    } catch(e) {}
+
+    if (lastLoad > 0) {
+      var diffSec = (now - lastLoad) / 1000;
+      if (diffSec >= 0.8 && diffSec <= 45) {
+        var times = [];
+        try {
+          var raw = JSON.parse(localStorage.getItem(KEY_FC_TIMES) || '[]');
+          if (Array.isArray(raw)) times = raw;
+        } catch(e) {}
+        times.push(diffSec);
+        if (times.length > 25) times.shift();
+        try {
+          localStorage.setItem(KEY_FC_TIMES, JSON.stringify(times));
+        } catch(e) {}
+      }
+    }
+
+    var lastDec = 0;
+    try {
+      lastDec = toSafeNum(localStorage.getItem(KEY_CARD_DEC), 0);
+      if (now - lastDec > 800) {
+        var sessionKey = 'anki_session_reviewed_cards';
+        var reviewed = toSafeNum(localStorage.getItem(sessionKey), 0);
+        localStorage.setItem(sessionKey, (reviewed + 1).toString());
+        localStorage.setItem(KEY_CARD_DEC, now.toString());
+      }
+    } catch(e) {}
+  }
+
+  function getEffectivePace() {
+    var times = [];
+    try {
+      var raw = JSON.parse(localStorage.getItem(KEY_FC_TIMES) || '[]');
+      if (Array.isArray(raw)) {
+        for (var k = 0; k < raw.length; k++) {
+          var t = parseFloat(raw[k]);
+          if (!isNaN(t) && t >= 0.5 && t <= 60) times.push(t);
+        }
+      }
+    } catch(e) {}
+
+    var paceSecPerCard = BASE_EXPECTED_SEC_PER_CARD;
+    var avgFlipSec = BASELINE_FLIP_SEC;
+
+    if (times.length >= 3) {
+      var sum = 0;
+      for (var i = 0; i < times.length; i++) sum += times[i];
+      var calcAvg = sum / times.length;
+      if (!isNaN(calcAvg) && calcAvg > 0) {
+        avgFlipSec = calcAvg;
+        var ratio = avgFlipSec / BASELINE_FLIP_SEC;
+        ratio = Math.max(0.5, Math.min(2.0, ratio));
+        paceSecPerCard = BASE_EXPECTED_SEC_PER_CARD * (0.7 * ratio + 0.3);
+      }
+    }
+
+    if (isNaN(paceSecPerCard) || paceSecPerCard <= 0) paceSecPerCard = BASE_EXPECTED_SEC_PER_CARD;
+    if (isNaN(avgFlipSec) || avgFlipSec <= 0) avgFlipSec = BASELINE_FLIP_SEC;
+
+    return {
+      paceSecPerCard: paceSecPerCard,
+      avgFlipSec: avgFlipSec,
+      multiplier: BASE_MULTIPLIER
+    };
+  }
+
+  function formatDuration(totalSec) {
+    if (isNaN(totalSec) || totalSec <= 0) return '0分';
+    var totalMin = Math.ceil(totalSec / 60);
+    if (isNaN(totalMin) || totalMin <= 0) return '0分';
+    if (totalMin < 60) {
+      return '約' + totalMin + '分';
+    }
+    var totalH = totalSec / 3600;
+    if (totalH >= 10) {
+      return '約' + totalH.toFixed(1) + '時間';
+    }
+    var h = Math.floor(totalMin / 60);
+    var m = totalMin % 60;
+    return '約' + h + '時間' + (m > 0 ? m + '分' : '');
+  }
+
+  function formatFinishClock(finishDate) {
+    if (!finishDate || isNaN(finishDate.getTime())) return '--:--';
+    var now = new Date();
+    var diffDays = Math.floor((finishDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    var hh = finishDate.getHours();
+    var mm = finishDate.getMinutes();
+    var hhStr = (hh < 10 ? '0' : '') + hh;
+    var mmStr = (mm < 10 ? '0' : '') + mm;
+
+    if (diffDays === 0 && finishDate.getDate() === now.getDate()) {
+      return hhStr + ':' + mmStr;
+    } else if (diffDays <= 1) {
+      return '明日 ' + hhStr + ':' + mmStr;
+    } else {
+      return '+' + diffDays + '日後';
+    }
+  }
+
+  function updatePredictionUI() {
+    try {
+      var dispEl = document.getElementById('bottom-prediction-display');
+      if (!dispEl) return;
+
+      var mode = getForecastMode();
+      var scope = getForecastScope();
+      var data = getDeckData();
+      var due = getCurrentDueCount();
+
+      // Mode tab buttons
+      var tabToday = document.getElementById('fc-tab-today');
+      var tabDeck = document.getElementById('fc-tab-deck');
+      if (tabToday) {
+        if (mode === 'today') tabToday.classList.add('active');
+        else tabToday.classList.remove('active');
+      }
+      if (tabDeck) {
+        if (mode === 'all_cards') tabDeck.classList.add('active');
+        else tabDeck.classList.remove('active');
+      }
+
+      // Scope buttons
+      var scAll = document.getElementById('fc-scope-all');
+      var scPart = document.getElementById('fc-scope-part');
+      if (scAll) {
+        if (scope === 'all') scAll.classList.add('active');
+        else scAll.classList.remove('active');
+      }
+      if (scPart) {
+        if (scope === 'part') scPart.classList.add('active');
+        else scPart.classList.remove('active');
+      }
+
+      var modePrefix = (mode === 'all_cards') ? '全完走' : '本日';
+      var scopeTag = (scope === 'part') ? ' [Part] ' : ' ';
+
+      if (due === 0) {
+        dispEl.textContent = '🏁 ' + (mode === 'all_cards' ? '全カード完了!' : '本日分完了!');
+        return;
+      }
+
+      var paceInfo = getEffectivePace();
+      var actualReviews = Math.round(due * paceInfo.multiplier);
+      var totalSec = Math.round(due * paceInfo.paceSecPerCard);
+      var durationStr = formatDuration(totalSec);
+      var finishDate = new Date(Date.now() + totalSec * 1000);
+      var clockStr = formatFinishClock(finishDate);
+
+      // Left Bottom Display
+      dispEl.textContent = '🏁 ' + modePrefix + '予測:' + scopeTag + durationStr + ' (残' + formatNum(due) + '枚)';
+
+      // Detail Panel elements
+      var fFinish = document.getElementById('fc-finish-time');
+      var fRemain = document.getElementById('fc-remain-time');
+      var fDue = document.getElementById('fc-due-cards');
+      var fActual = document.getElementById('fc-actual-reviews');
+      var fPace = document.getElementById('fc-pace');
+      var fBreakdown = document.getElementById('fc-breakdown');
+
+      if (fFinish) fFinish.textContent = clockStr;
+      if (fRemain) fRemain.textContent = durationStr;
+      if (fDue) fDue.textContent = formatNum(due) + '枚';
+      if (fActual) fActual.textContent = '約' + formatNum(actualReviews) + '回';
+      if (fPace) fPace.textContent = paceInfo.avgFlipSec.toFixed(1) + '秒/問';
+
+      if (fBreakdown) {
+        if (mode === 'today') {
+          fBreakdown.textContent = '本日内訳: 新規' + formatNum(data.newCount) + '枚 / 復習' + formatNum(data.revCount) + '枚' + (data.lrnCount ? ' / 習得中' + data.lrnCount + '枚' : '');
+        } else {
+          fBreakdown.textContent = '要学習残: ' + formatNum(due) + '枚 (新規未着手・期日分 / 総計' + formatNum(data.totalCards) + '枚中)';
+        }
+      }
+    } catch(err) {}
+  }
+
+  window.resetSessionReviewed = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    try {
+      localStorage.removeItem('anki_session_reviewed_cards');
+      updatePredictionUI();
+    } catch(err) {}
+    return false;
+  };
+
+  recordCardPacing();
+  updatePredictionUI();
+
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', function(e) {
+    var stockPanel = document.getElementById('hdr-stock-panel');
+    var timerPanel = document.getElementById('hdr-timer-panel');
+    var predPanel = document.getElementById('hdr-prediction-panel');
+    var clipBtn = document.getElementById('hdr-clip-btn');
+    var timeDisplay = document.getElementById('bottom-time-display');
+    var predDisplay = document.getElementById('bottom-prediction-display');
+
+    if (stockPanel && stockPanel.style.display === 'block') {
+      if (!stockPanel.contains(e.target) && (!clipBtn || !clipBtn.contains(e.target))) {
+        stockPanel.style.display = 'none';
+      }
+    }
+    if (timerPanel && timerPanel.style.display === 'block') {
+      if (!timerPanel.contains(e.target) && (!timeDisplay || !timeDisplay.contains(e.target))) {
+        timerPanel.style.display = 'none';
+      }
+    }
+    if (predPanel && predPanel.style.display === 'block') {
+      if (!predPanel.contains(e.target) && (!predDisplay || !predDisplay.contains(e.target))) {
+        predPanel.style.display = 'none';
+      }
+    }
+  });
+})();
+</script>

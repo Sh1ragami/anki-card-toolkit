@@ -1,0 +1,28 @@
+<!-- Prediction Display in Bottom HUD -->
+<div id="bottom-prediction-display" onclick="window.togglePredictionPanel(event)" title="タップで学習完了予測の詳細・モード切替">🏁 予測: 計算中...</div>
+
+<!-- Prediction Detail Modal Panel -->
+<div class="hdr-dropdown-panel" id="hdr-prediction-panel" onclick="event.stopPropagation()">
+  <div class="dropdown-header">
+    <span>STUDY FORECAST</span>
+    <button type="button" class="dropdown-action-btn" onclick="window.resetSessionReviewed(event)" style="font-size:11px;">🔄 リセット</button>
+  </div>
+  <div class="forecast-mode-tabs">
+    <button type="button" class="fc-tab-btn active" id="fc-tab-today" onclick="window.setForecastMode('today', event)">📅 本日の学習分</button>
+    <button type="button" class="fc-tab-btn" id="fc-tab-deck" onclick="window.setForecastMode('all_cards', event)">📚 全カード完走</button>
+  </div>
+  <div class="forecast-scope-bar">
+    <span style="font-size:10px; color:#6d7d6f;">範囲:</span>
+    <button type="button" class="fc-scope-btn active" id="fc-scope-all" onclick="window.setForecastScope('all', event)">🌍 全体</button>
+    <button type="button" class="fc-scope-btn" id="fc-scope-part" onclick="window.setForecastScope('part', event)">📖 このPartのみ</button>
+  </div>
+  <div class="forecast-content">
+    <div class="forecast-row"><span class="forecast-label">完了予定:</span> <span class="forecast-val highlight" id="fc-finish-time">--:--</span></div>
+    <div class="forecast-row"><span class="forecast-label">残り所要時間:</span> <span class="forecast-val" id="fc-remain-time">--分</span></div>
+    <div class="forecast-row"><span class="forecast-label">残り対象枚数:</span> <span class="forecast-val" id="fc-due-cards">--枚</span></div>
+    <div id="fc-breakdown" style="font-size:10px; color:#6d7d6f; margin-bottom:4px; text-align:right;"></div>
+    <div class="forecast-row"><span class="forecast-label">実質解答予測:</span> <span class="forecast-val" id="fc-actual-reviews">約--回</span></div>
+    <div class="forecast-subnote">※ミス・再出題率(約46%)を加味して計算</div>
+    <div class="forecast-row" style="margin-top:6px; border-top:1px dashed rgba(72,89,75,0.25); padding-top:6px;"><span class="forecast-label">直近ペース:</span> <span class="forecast-val" id="fc-pace">--秒/問</span></div>
+  </div>
+</div>

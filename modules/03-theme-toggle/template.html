@@ -1,0 +1,17 @@
+<!-- Place at the VERY FIRST LINE of Card Template for Zero-Flicker Preload -->
+<style id="custom-theme-style"></style>
+<script>
+(function() {
+  var isDark = false;
+  try { isDark = (localStorage.getItem('anki_theme_preference') === 'dark'); } catch(e) {}
+  if (isDark) {
+    document.documentElement.classList.add('theme-dark');
+    document.body && document.body.classList.add('theme-dark');
+    var st = document.getElementById('custom-theme-style');
+    if (st) st.textContent = 'html, body, #qa, .card, .card-box { background-color: #000000 !important; color: #e5e5e5 !important; }';
+  }
+})();
+</script>
+
+<!-- Theme Toggle Button inside Header -->
+<button type="button" class="emoji-btn" id="hdr-theme-btn" onclick="window.toggleCardTheme(event)" title="テーマ切替">🌙</button>

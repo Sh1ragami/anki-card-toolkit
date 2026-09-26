@@ -1,0 +1,14 @@
+<!-- Header Button -->
+<button type="button" class="emoji-btn" id="hdr-clip-btn" onclick="window.handleClipClick(event)" title="単語保存 (タップで保存 / 済なら一覧)">📎</button>
+
+<!-- Saved Words Dropdown Panel -->
+<div class="hdr-dropdown-panel" id="hdr-stock-panel" onclick="event.stopPropagation()">
+  <div class="dropdown-header">
+    <span>SAVED WORDS</span>
+    <div class="dropdown-btn-group">
+      <button type="button" class="dropdown-action-btn copy" id="hdr-copy-btn" onclick="window.copyStockList(event)">📋 COPY</button>
+      <button type="button" class="dropdown-action-btn clear" onclick="window.clearStockList(event)">CLEAR</button>
+    </div>
+  </div>
+  <ul class="stock-ul" id="hdr-stock-ul"></ul>
+</div>
