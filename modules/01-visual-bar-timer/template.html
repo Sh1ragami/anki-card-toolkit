@@ -98,10 +98,13 @@
     }
 
     var alertOn = (localStorage.getItem('anki_hud_alert') || sessionStorage.getItem('anki_hud_alert')) !== 'off';
-    var dismissed = localStorage.getItem('anki_timer_alert_dismissed') || sessionStorage.getItem('anki_timer_alert_dismissed');
+    var dismissed = localStorage.getItem('anki_timer_alert_dismissed') || sessionStorage.getItem('anki_timer_alert_dismissed') || window.__anki_timer_alert_dismissed;
     if (endTime > 0 && remSec <= 0 && alertOn && dismissed !== endTime.toString()) {
       var toast = document.getElementById('timer-finish-toast');
-      if (toast) toast.style.display = 'flex';
+      if (toast) {
+        toast.classList.add('show');
+        toast.style.setProperty('display', 'flex', 'important');
+      }
       if (tEl) tEl.classList.add('timer-finished');
     }
   } catch(e) {}

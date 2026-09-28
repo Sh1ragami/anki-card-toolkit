@@ -538,7 +538,7 @@ html.theme-dark #bottom-time-display.timer-finished {
   left: 50% !important;
   transform: translateX(-50%) !important;
   z-index: 1000005 !important;
-  display: flex !important;
+  display: none !important;
   align-items: center !important;
   justify-content: space-between !important;
   gap: 10px !important;
@@ -558,6 +558,10 @@ html.theme-dark #bottom-time-display.timer-finished {
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
   animation: toastSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.timer-finish-toast.show {
+  display: flex !important;
 }
 
 @keyframes toastSlideDown {

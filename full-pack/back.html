@@ -257,10 +257,13 @@ root.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', '
     }
 
     var alertOn = (localStorage.getItem('anki_hud_alert') || sessionStorage.getItem('anki_hud_alert')) !== 'off';
-    var dismissed = localStorage.getItem('anki_timer_alert_dismissed') || sessionStorage.getItem('anki_timer_alert_dismissed');
+    var dismissed = localStorage.getItem('anki_timer_alert_dismissed') || sessionStorage.getItem('anki_timer_alert_dismissed') || window.__anki_timer_alert_dismissed;
     if (endTime > 0 && remSec <= 0 && alertOn && dismissed !== endTime.toString()) {
       var toast = document.getElementById('timer-finish-toast');
-      if (toast) toast.style.display = 'flex';
+      if (toast) {
+        toast.classList.add('show');
+        toast.style.setProperty('display', 'flex', 'important');
+      }
       if (tEl) tEl.classList.add('timer-finished');
     }
   } catch(e) {}
@@ -586,7 +589,10 @@ if (typeof playExampleAudio === 'undefined') {
     return false;
   };
 
+  var isManuallyDismissed = false;
+
   function isAlertDismissed() {
+    if (isManuallyDismissed) return true;
     if (dismissedEndTime && dismissedEndTime === session.endTime) return true;
     try {
       if (window.__anki_timer_alert_dismissed && window.__anki_timer_alert_dismissed === session.endTime.toString()) return true;
@@ -599,15 +605,17 @@ if (typeof playExampleAudio === 'undefined') {
 
   function showTimerToast() {
     var toast = document.getElementById('timer-finish-toast');
-    if (toast && toast.style.display !== 'flex') {
-      toast.style.display = 'flex';
+    if (toast) {
+      toast.classList.add('show');
+      toast.style.setProperty('display', 'flex', 'important');
     }
   }
 
   function hideTimerToast() {
     var toast = document.getElementById('timer-finish-toast');
-    if (toast && toast.style.display !== 'none') {
-      toast.style.display = 'none';
+    if (toast) {
+      toast.classList.remove('show');
+      toast.style.setProperty('display', 'none', 'important');
     }
   }
 
@@ -616,6 +624,7 @@ if (typeof playExampleAudio === 'undefined') {
       if (e.stopPropagation) e.stopPropagation();
       if (e.preventDefault) e.preventDefault();
     }
+    isManuallyDismissed = true;
     dismissedEndTime = session.endTime;
     try {
       localStorage.setItem(KEY_ALERT_DISMISSED, session.endTime.toString());
@@ -641,6 +650,15 @@ if (typeof playExampleAudio === 'undefined') {
     if (closeBtn) {
       closeBtn.onclick = window.dismissTimerToast;
       closeBtn.ontouchstart = window.dismissTimerToast;
+      closeBtn.addEventListener('click', window.dismissTimerToast, true);
+      closeBtn.addEventListener('mousedown', window.dismissTimerToast, true);
+    }
+    var toast = document.getElementById('timer-finish-toast');
+    if (toast) {
+      toast.addEventListener('click', function(ev) {
+        if (ev.target && (ev.target.classList.contains('toast-break-btn') || ev.target.closest('.toast-break-btn'))) return;
+        window.dismissTimerToast(ev);
+      }, true);
     }
   }
 
@@ -734,6 +752,7 @@ if (typeof playExampleAudio === 'undefined') {
     session.totalMs = totalMs;
     session.endTime = Date.now() + totalMs;
     dismissedEndTime = 0;
+    isManuallyDismissed = false;
     try {
       localStorage.setItem(KEY_END, session.endTime.toString());
       localStorage.setItem(KEY_TOTAL, totalMs.toString());
@@ -755,6 +774,7 @@ if (typeof playExampleAudio === 'undefined') {
   window.resetStudySession = function(e) {
     if (e) { e.stopPropagation(); e.preventDefault(); }
     dismissedEndTime = 0;
+    isManuallyDismissed = false;
     try {
       localStorage.removeItem(KEY_END);
       localStorage.removeItem(KEY_TOTAL);

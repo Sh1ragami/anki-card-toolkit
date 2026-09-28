@@ -169,7 +169,10 @@
     return false;
   };
 
+  var isManuallyDismissed = false;
+
   function isAlertDismissed() {
+    if (isManuallyDismissed) return true;
     if (dismissedEndTime && dismissedEndTime === session.endTime) return true;
     try {
       if (window.__anki_timer_alert_dismissed && window.__anki_timer_alert_dismissed === session.endTime.toString()) return true;
@@ -182,15 +185,17 @@
 
   function showTimerToast() {
     var toast = document.getElementById('timer-finish-toast');
-    if (toast && toast.style.display !== 'flex') {
-      toast.style.display = 'flex';
+    if (toast) {
+      toast.classList.add('show');
+      toast.style.setProperty('display', 'flex', 'important');
     }
   }
 
   function hideTimerToast() {
     var toast = document.getElementById('timer-finish-toast');
-    if (toast && toast.style.display !== 'none') {
-      toast.style.display = 'none';
+    if (toast) {
+      toast.classList.remove('show');
+      toast.style.setProperty('display', 'none', 'important');
     }
   }
 
@@ -199,6 +204,7 @@
       if (e.stopPropagation) e.stopPropagation();
       if (e.preventDefault) e.preventDefault();
     }
+    isManuallyDismissed = true;
     dismissedEndTime = session.endTime;
     try {
       localStorage.setItem(KEY_ALERT_DISMISSED, session.endTime.toString());
@@ -224,6 +230,15 @@
     if (closeBtn) {
       closeBtn.onclick = window.dismissTimerToast;
       closeBtn.ontouchstart = window.dismissTimerToast;
+      closeBtn.addEventListener('click', window.dismissTimerToast, true);
+      closeBtn.addEventListener('mousedown', window.dismissTimerToast, true);
+    }
+    var toast = document.getElementById('timer-finish-toast');
+    if (toast) {
+      toast.addEventListener('click', function(ev) {
+        if (ev.target && (ev.target.classList.contains('toast-break-btn') || ev.target.closest('.toast-break-btn'))) return;
+        window.dismissTimerToast(ev);
+      }, true);
     }
   }
 
@@ -307,6 +322,7 @@
     session.totalMs = totalMs;
     session.endTime = Date.now() + totalMs;
     dismissedEndTime = 0;
+    isManuallyDismissed = false;
     try {
       localStorage.setItem(KEY_END, session.endTime.toString());
       localStorage.setItem(KEY_TOTAL, totalMs.toString());
@@ -328,6 +344,7 @@
   window.resetStudySession = function(e) {
     if (e) { e.stopPropagation(); e.preventDefault(); }
     dismissedEndTime = 0;
+    isManuallyDismissed = false;
     try {
       localStorage.removeItem(KEY_END);
       localStorage.removeItem(KEY_TOTAL);
