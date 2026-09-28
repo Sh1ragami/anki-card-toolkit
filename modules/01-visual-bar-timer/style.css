@@ -126,3 +126,353 @@
 .theme-dark #screen-bottom-bar-ticks div { border-right-color: #000000 !important; }
 .theme-dark #hdr-timer-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; }
 .theme-dark .timer-menu-btn { background: rgba(255, 255, 255, 0.05) !important; border-color: rgba(255, 255, 255, 0.12) !important; color: #f2f2f2 !important; }
+    #1173f0 75%, #1173f0 100%
+  ) !important;
+}
+
+#screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-ticks {
+  flex-direction: row !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+#screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-ticks div {
+  flex: 1 !important;
+  border-right: 2px solid #B6BDA7 !important;
+  border-bottom: none !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
+#screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-ticks div:last-child {
+  border-right: none !important;
+}
+
+/* Position: Top (horizontal) */
+#screen-bottom-hud.hud-pos-top {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  flex-direction: column !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+}
+
+#screen-bottom-hud.hud-pos-top #screen-bottom-bar-track {
+  order: 1 !important;
+  width: 100% !important;
+  height: 10px !important;
+}
+
+#screen-bottom-hud.hud-pos-top #bottom-info-row {
+  order: 2 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  padding: 5px 14px 0 14px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#screen-bottom-hud.hud-pos-top #screen-bottom-bar-fill {
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(
+    to right,
+    #e17911 0%, #e17911 25%,
+    #90d312 25%, #90d312 50%,
+    #08ac5d 50%, #08ac5d 75%,
+    #1173f0 75%, #1173f0 100%
+  ) !important;
+}
+
+#screen-bottom-hud.hud-pos-top #screen-bottom-bar-ticks {
+  flex-direction: row !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+#screen-bottom-hud.hud-pos-top #screen-bottom-bar-ticks div {
+  flex: 1 !important;
+  border-right: 2px solid #B6BDA7 !important;
+  border-bottom: none !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
+#screen-bottom-hud.hud-pos-top #screen-bottom-bar-ticks div:last-child {
+  border-right: none !important;
+}
+
+/* Position: Left (vertical bar) */
+#screen-bottom-hud.hud-pos-left {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  width: 12px !important;
+  height: 100% !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+}
+
+#screen-bottom-hud.hud-pos-left #bottom-info-row {
+  position: fixed !important;
+  bottom: 6px !important;
+  left: 18px !important;
+  right: 14px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: flex-end !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  width: calc(100% - 32px) !important;
+  box-sizing: border-box !important;
+}
+
+#screen-bottom-hud.hud-pos-left #screen-bottom-bar-track {
+  width: 12px !important;
+  height: 100% !important;
+}
+
+#screen-bottom-hud.hud-pos-left #screen-bottom-bar-fill {
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(
+    to bottom,
+    #1173f0 0%, #1173f0 25%,
+    #08ac5d 25%, #08ac5d 50%,
+    #90d312 50%, #90d312 75%,
+    #e17911 75%, #e17911 100%
+  ) !important;
+}
+
+#screen-bottom-hud.hud-pos-left #screen-bottom-bar-ticks {
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+#screen-bottom-hud.hud-pos-left #screen-bottom-bar-ticks div {
+  flex: 1 !important;
+  border-right: none !important;
+  border-bottom: 2px solid #B6BDA7 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+#screen-bottom-hud.hud-pos-left #screen-bottom-bar-ticks div:last-child {
+  border-bottom: none !important;
+}
+
+/* Position: Right (vertical bar) */
+#screen-bottom-hud.hud-pos-right {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: auto !important;
+  right: 0 !important;
+  width: 12px !important;
+  height: 100% !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+}
+
+#screen-bottom-hud.hud-pos-right #bottom-info-row {
+  position: fixed !important;
+  bottom: 6px !important;
+  left: 14px !important;
+  right: 18px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: flex-end !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  width: calc(100% - 32px) !important;
+  box-sizing: border-box !important;
+}
+
+#screen-bottom-hud.hud-pos-right #screen-bottom-bar-track {
+  width: 12px !important;
+  height: 100% !important;
+}
+
+#screen-bottom-hud.hud-pos-right #screen-bottom-bar-fill {
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(
+    to bottom,
+    #1173f0 0%, #1173f0 25%,
+    #08ac5d 25%, #08ac5d 50%,
+    #90d312 50%, #90d312 75%,
+    #e17911 75%, #e17911 100%
+  ) !important;
+}
+
+#screen-bottom-hud.hud-pos-right #screen-bottom-bar-ticks {
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+#screen-bottom-hud.hud-pos-right #screen-bottom-bar-ticks div {
+  flex: 1 !important;
+  border-right: none !important;
+  border-bottom: 2px solid #B6BDA7 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+#screen-bottom-hud.hud-pos-right #screen-bottom-bar-ticks div:last-child {
+  border-bottom: none !important;
+}
+
+.theme-dark #screen-bottom-bar-ticks div {
+  border-color: #000000 !important;
+}
+
+/* Dynamic positioning for Dropdown Panels based on HUD position */
+html.hud-layout-top #hdr-stock-panel,
+body.hud-layout-top #hdr-stock-panel {
+  top: 54px !important;
+  bottom: auto !important;
+  right: 12px !important;
+}
+html.hud-layout-top #hdr-timer-panel,
+body.hud-layout-top #hdr-timer-panel {
+  top: 54px !important;
+  bottom: auto !important;
+  right: 12px !important;
+}
+html.hud-layout-top #hdr-prediction-panel,
+body.hud-layout-top #hdr-prediction-panel {
+  top: 54px !important;
+  bottom: auto !important;
+  left: 12px !important;
+}
+
+
+
+
+/* ============================================================
+   HUD Bar Thickness System (Thin, Normal, Thick, Huge)
+   ============================================================ */
+/* Buttons */
+.hud-thick-btn {
+  flex: 1 !important;
+  padding: 3px 2px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  border-radius: 3px !important;
+  border: 1px solid rgba(72, 89, 75, 0.28) !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #48594b !important;
+  text-align: center !important;
+  transition: all 0.15s ease !important;
+}
+
+.hud-thick-btn.active {
+  background: #1e2b20 !important;
+  color: #ffffff !important;
+  border-color: #1e2b20 !important;
+  font-weight: 700 !important;
+}
+
+.theme-dark .hud-thick-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #a3a3a3 !important;
+}
+
+.theme-dark .hud-thick-btn.active, html.theme-dark .hud-thick-btn.active {
+  background: #ff5555 !important;
+  color: #ffffff !important;
+  border-color: #ff5555 !important;
+  font-weight: 700 !important;
+}
+
+/* 1. Thin (細め): 5px horizontal / 6px vertical */
+.hud-thick-thin #screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-track,
+.hud-thick-thin #screen-bottom-hud.hud-pos-top #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thin.hud-pos-bottom #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thin.hud-pos-top #screen-bottom-bar-track {
+  height: 5px !important;
+}
+
+.hud-thick-thin #screen-bottom-hud.hud-pos-left,
+.hud-thick-thin #screen-bottom-hud.hud-pos-left #screen-bottom-bar-track,
+.hud-thick-thin #screen-bottom-hud.hud-pos-right,
+.hud-thick-thin #screen-bottom-hud.hud-pos-right #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thin.hud-pos-left,
+#screen-bottom-hud.hud-thick-thin.hud-pos-left #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thin.hud-pos-right,
+#screen-bottom-hud.hud-thick-thin.hud-pos-right #screen-bottom-bar-track {
+  width: 6px !important;
+}
+
+/* 2. Normal (標準 - default): 10px horizontal / 12px vertical */
+.hud-thick-normal #screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-track,
+.hud-thick-normal #screen-bottom-hud.hud-pos-top #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-normal.hud-pos-bottom #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-normal.hud-pos-top #screen-bottom-bar-track {
+  height: 10px !important;
+}
+
+.hud-thick-normal #screen-bottom-hud.hud-pos-left,
+.hud-thick-normal #screen-bottom-hud.hud-pos-left #screen-bottom-bar-track,
+.hud-thick-normal #screen-bottom-hud.hud-pos-right,
+.hud-thick-normal #screen-bottom-hud.hud-pos-right #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-normal.hud-pos-left,
+#screen-bottom-hud.hud-thick-normal.hud-pos-left #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-normal.hud-pos-right,
+#screen-bottom-hud.hud-thick-normal.hud-pos-right #screen-bottom-bar-track {
+  width: 12px !important;
+}
+
+/* 3. Thick (太め): 18px horizontal / 20px vertical */
+.hud-thick-thick #screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-track,
+.hud-thick-thick #screen-bottom-hud.hud-pos-top #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thick.hud-pos-bottom #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thick.hud-pos-top #screen-bottom-bar-track {
+  height: 18px !important;
+}
+
+.hud-thick-thick #screen-bottom-hud.hud-pos-left,
+.hud-thick-thick #screen-bottom-hud.hud-pos-left #screen-bottom-bar-track,
+.hud-thick-thick #screen-bottom-hud.hud-pos-right,
+.hud-thick-thick #screen-bottom-hud.hud-pos-right #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thick.hud-pos-left,
+#screen-bottom-hud.hud-thick-thick.hud-pos-left #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thick.hud-pos-right,
+#screen-bottom-hud.hud-thick-thick.hud-pos-right #screen-bottom-bar-track {
+  width: 20px !important;
+}
+
+.hud-thick-thick.hud-layout-left .card-box, html.hud-thick-thick.hud-layout-left .card-box { padding-left: 36px !important; }
+.hud-thick-thick.hud-layout-right .card-box, html.hud-thick-thick.hud-layout-right .card-box { padding-right: 36px !important; }
+.hud-thick-thick.hud-layout-top .card-box, html.hud-thick-thick.hud-layout-top .card-box { padding-top: 66px !important; }
+
+/* 4. Huge (極太): 28px horizontal / 30px vertical */
+.hud-thick-huge #screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-track,
+.hud-thick-huge #screen-bottom-hud.hud-pos-top #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-huge.hud-pos-bottom #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-huge.hud-pos-top #screen-bottom-bar-track {
+  height: 28px !important;
+}
+
+.hud-thick-huge #screen-bottom-hud.hud-pos-left,
+.hud-thick-huge #screen-bottom-hud.hud-pos-left #screen-bottom-bar-track,
+.hud-thick-huge #screen-bottom-hud.hud-pos-right,
+.hud-thick-huge #screen-bottom-hud.hud-pos-right #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-huge.hud-pos-left,
+#screen-bottom-hud.hud-thick-huge.hud-pos-left #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-huge.hud-pos-right,
+#screen-bottom-hud.hud-thick-huge.hud-pos-right #screen-bottom-bar-track {
+  width: 30px !important;
+}
+
+.hud-thick-huge.hud-layout-left .card-box, html.hud-thick-huge.hud-layout-left .card-box { padding-left: 46px !important; }
+.hud-thick-huge.hud-layout-right .card-box, html.hud-thick-huge.hud-layout-right .card-box { padding-right: 46px !important; }
+.hud-thick-huge.hud-layout-top .card-box, html.hud-thick-huge.hud-layout-top .card-box { padding-top: 76px !important; }

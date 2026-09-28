@@ -1,14 +1,23 @@
 <!-- Place at the VERY FIRST LINE of Card Template for Zero-Flicker Preload -->
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
 <style id="custom-theme-style"></style>
 <script>
 (function() {
   var isDark = false;
-  try { isDark = (localStorage.getItem('anki_theme_preference') === 'dark'); } catch(e) {}
+  try {
+    var pref = localStorage.getItem('anki_theme_preference') || sessionStorage.getItem('anki_theme_preference');
+    isDark = (pref === 'dark');
+  } catch(e) {
+    try { isDark = (window.__anki_theme_preference === 'dark'); } catch(e2) {}
+  }
+  var root = document.documentElement;
   if (isDark) {
-    document.documentElement.classList.add('theme-dark');
-    document.body && document.body.classList.add('theme-dark');
-    var st = document.getElementById('custom-theme-style');
-    if (st) st.textContent = 'html, body, #qa, .card, .card-box { background-color: #000000 !important; color: #e5e5e5 !important; }';
+    root.classList.add('theme-dark');
+    root.classList.remove('theme-green');
+  } else {
+    root.classList.remove('theme-dark');
+    root.classList.add('theme-green');
   }
 })();
 </script>

@@ -1,35 +1,42 @@
 (function() {
-  var darkCss = [
-    'html, body, #qa, .card, .card-box { background-color: #000000 !important; color: #e5e5e5 !important; }',
-    '.phrase-en, .word-text-overlay, .word-text-plain, .meaning-block, .meaning-item { color: #f2f2f2 !important; }',
-    '.phrase-ja { color: #cccccc !important; }',
-    '.target-word, .phrase-ja .target-word-ja { color: #ff5555 !important; }',
-    '.header-bar, .word-no, .badge-level, .phonetic, .sound-btn { color: #888888 !important; }'
-  ].join('\n');
-
   function getTheme() {
-    try { return localStorage.getItem('anki_theme_preference') || 'green'; } catch(e) { return 'green'; }
+    try {
+      var t = localStorage.getItem('anki_theme_preference');
+      if (t) return t;
+    } catch(e) {}
+    try {
+      var st = sessionStorage.getItem('anki_theme_preference');
+      if (st) return st;
+    } catch(e) {}
+    try {
+      if (window.__anki_theme_preference) return window.__anki_theme_preference;
+    } catch(e) {}
+    return 'green';
   }
 
   function setTheme(theme) {
     try { localStorage.setItem('anki_theme_preference', theme); } catch(e) {}
+    try { sessionStorage.setItem('anki_theme_preference', theme); } catch(e) {}
+    try { window.__anki_theme_preference = theme; } catch(e) {}
   }
 
   function applyThemeDisplay(theme) {
     var isDark = (theme === 'dark');
-    var styleTag = document.getElementById('custom-theme-style');
-    if (!styleTag) {
-      styleTag = document.createElement('style');
-      styleTag.id = 'custom-theme-style';
-      document.head.appendChild(styleTag);
-    }
-    styleTag.textContent = isDark ? darkCss : '';
+    var root = document.documentElement;
     if (isDark) {
-      document.body.classList.add('theme-dark');
-      document.documentElement.classList.add('theme-dark');
+      root.classList.add('theme-dark');
+      root.classList.remove('theme-green');
+      if (document.body) {
+        document.body.classList.add('theme-dark');
+        document.body.classList.remove('theme-green');
+      }
     } else {
-      document.body.classList.remove('theme-dark');
-      document.documentElement.classList.remove('theme-dark');
+      root.classList.remove('theme-dark');
+      root.classList.add('theme-green');
+      if (document.body) {
+        document.body.classList.remove('theme-dark');
+        document.body.classList.add('theme-green');
+      }
     }
     var icon = document.getElementById('hdr-theme-btn');
     if (icon) icon.textContent = isDark ? '☀️' : '🌙';

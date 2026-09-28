@@ -22,6 +22,26 @@
   <button type="button" class="timer-menu-btn" onclick="window.startStudySession(45, event)">🎯 45 分集中</button>
   <button type="button" class="timer-menu-btn" onclick="window.startStudySession(60, event)">🔥 60 分集中</button>
   <button type="button" class="timer-menu-btn" id="hdr-barmode-btn" onclick="window.toggleBarMode(event)" style="border-top: 1px dashed rgba(72, 89, 75, 0.3); margin-top: 4px; padding-top: 6px;">📊 表示: ⏳ 残り勉強時間</button>
+    <!-- HUD Position Selector (Bottom, Top, Left, Right) -->
+  <div class="timer-pos-bar" style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(72, 89, 75, 0.25);">
+    <div style="font-size: 10px; font-weight: 700; color: #48594b; margin-bottom: 4px;">📍 バー配置:</div>
+    <div style="display: flex; gap: 3px;">
+      <button type="button" class="hud-pos-btn" id="hud-pos-btn-bottom" onclick="window.setHudPosition('bottom', event)">下 (横)</button>
+      <button type="button" class="hud-pos-btn" id="hud-pos-btn-top" onclick="window.setHudPosition('top', event)">上 (横)</button>
+      <button type="button" class="hud-pos-btn" id="hud-pos-btn-left" onclick="window.setHudPosition('left', event)">左 (縦)</button>
+      <button type="button" class="hud-pos-btn" id="hud-pos-btn-right" onclick="window.setHudPosition('right', event)">右 (縦)</button>
+    </div>
+  </div>
+  <!-- HUD Thickness Selector (Thin, Normal, Thick, Huge) -->
+  <div class="timer-thick-bar" style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(72, 89, 75, 0.25);">
+    <div style="font-size: 10px; font-weight: 700; color: #48594b; margin-bottom: 4px;">📏 バー太さ:</div>
+    <div style="display: flex; gap: 3px;">
+      <button type="button" class="hud-thick-btn" id="hud-thick-btn-thin" onclick="window.setHudThickness('thin', event)">細め</button>
+      <button type="button" class="hud-thick-btn" id="hud-thick-btn-normal" onclick="window.setHudThickness('normal', event)">標準</button>
+      <button type="button" class="hud-thick-btn" id="hud-thick-btn-thick" onclick="window.setHudThickness('thick', event)">太め</button>
+      <button type="button" class="hud-thick-btn" id="hud-thick-btn-huge" onclick="window.setHudThickness('huge', event)">極太</button>
+    </div>
+  </div>
   <button type="button" class="timer-menu-btn reset" onclick="window.resetStudySession(event)">🔄 タイマーリセット</button>
 </div>
 

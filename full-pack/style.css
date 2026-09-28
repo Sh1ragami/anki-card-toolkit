@@ -1,8 +1,13 @@
 /* Custom Soft Spring Green Theme (#B6BDA7) - Unified Large Typography */
 
 :root {
+  color-scheme: light dark !important;
   --canvas: #B6BDA7 !important;
   --fg: #141f17 !important;
+}
+
+html {
+  color-scheme: light dark !important;
 }
 
 html, body, #qa, .card {
@@ -22,9 +27,38 @@ html, body, #qa, .card {
   margin: 0 auto !important;
   background-color: #B6BDA7 !important;
   color: #141f17 !important;
-  padding: 24px 30px !important;
+  padding: 24px 30px 52px 30px !important;
   box-sizing: border-box !important;
   text-align: left !important;
+}
+
+@media (max-width: 480px) {
+  .card-box {
+    padding: 16px 16px 52px 16px !important;
+  }
+}
+
+/* HUD Position based Card Box padding to prevent overlapping card elements */
+html.hud-layout-top .card-box,
+body.hud-layout-top .card-box {
+  padding-top: 58px !important;
+}
+
+html.hud-layout-right .card-box,
+body.hud-layout-right .card-box {
+  padding-right: 28px !important;
+  padding-bottom: 52px !important;
+}
+
+html.hud-layout-left .card-box,
+body.hud-layout-left .card-box {
+  padding-left: 28px !important;
+  padding-bottom: 52px !important;
+}
+
+html.hud-layout-bottom .card-box,
+body.hud-layout-bottom .card-box {
+  padding-bottom: 52px !important;
 }
 
 /* Header bar */
@@ -192,14 +226,15 @@ html, body, #qa, .card {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  font-size: 16px !important;
+  font-size: 15px !important;
   font-weight: 700 !important;
-  color: #ffffff !important;
-  background-color: #384b3e !important;
-  padding: 2px 9px !important;
+  color: #141f17 !important;
+  background-color: rgba(40, 54, 43, 0.12) !important;
+  border: 1.5px solid #28362b !important;
+  padding: 1px 8px !important;
   border-radius: 4px !important;
   margin-right: 10px !important;
-  vertical-align: 3px !important;
+  vertical-align: 2px !important;
   line-height: 1.3 !important;
 }
 
@@ -213,12 +248,31 @@ html, body, #qa, .card {
   margin-top: 16px !important;
 }
 
-/* NightMode Overrides */
-.nightMode, .nightMode body, .night_mode, .night_mode body,
-.nightMode #qa, .night_mode #qa,
-.nightMode .card, .night_mode .card,
-.nightMode .card-box, .night_mode .card-box {
+/* Green Theme Overrides (Active ONLY when html does NOT have .theme-dark) */
+html:not(.theme-dark), html.theme-green,
+html:not(.theme-dark) body, html.theme-green body,
+html:not(.theme-dark) #qa, html.theme-green #qa,
+html:not(.theme-dark) .card, html.theme-green .card,
+html:not(.theme-dark) .card-box, html.theme-green .card-box,
+html:not(.theme-dark) body.nightMode, html:not(.theme-dark) body.night_mode,
+html:not(.theme-dark) .nightMode #qa, html:not(.theme-dark) .night_mode #qa,
+html:not(.theme-dark) .nightMode .card, html:not(.theme-dark) .night_mode .card,
+html:not(.theme-dark) .nightMode .card-box, html:not(.theme-dark) .night_mode .card-box,
+html:not(.theme-dark) body.nightMode .card-box, html:not(.theme-dark) body.night_mode .card-box {
   background-color: #B6BDA7 !important;
+  color: #141f17 !important;
+}
+
+html:not(.theme-dark) .phrase-en, html.theme-green .phrase-en,
+html:not(.theme-dark) .word-text-overlay, html.theme-green .word-text-overlay,
+html:not(.theme-dark) .word-text-plain, html.theme-green .word-text-plain,
+html:not(.theme-dark) .meaning-block, html.theme-green .meaning-block,
+html:not(.theme-dark) .meaning-item, html.theme-green .meaning-item,
+html:not(.theme-dark) .header-bar, html.theme-green .header-bar,
+html:not(.theme-dark) .word-no, html.theme-green .word-no,
+html:not(.theme-dark) .badge-level, html.theme-green .badge-level,
+html:not(.theme-dark) .phonetic, html.theme-green .phonetic,
+html:not(.theme-dark) .sound-btn, html.theme-green .sound-btn {
   color: #141f17 !important;
 }
 
@@ -418,10 +472,10 @@ html.theme-dark, body.theme-dark, #qa.theme-dark, .card.theme-dark,
   background: #262626 !important;
 }
 
-.theme-dark .pos-tag {
-  background-color: #222222 !important;
+.theme-dark .pos-tag, html.theme-dark .pos-tag {
+  background-color: rgba(255, 255, 255, 0.12) !important;
   color: #ffffff !important;
-  border: 1px solid #444444 !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
 .theme-dark .extra-info {
@@ -521,6 +575,7 @@ html.theme-dark, body.theme-dark, #qa.theme-dark, .card.theme-dark,
   display: flex !important;
   justify-content: space-between !important;
   align-items: flex-end !important;
+  gap: 8px !important;
   padding: 0 14px 5px 14px !important;
   box-sizing: border-box !important;
   width: 100% !important;
@@ -528,9 +583,13 @@ html.theme-dark, body.theme-dark, #qa.theme-dark, .card.theme-dark,
 }
 
 #bottom-prediction-display {
-  display: inline-block !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 700 !important;
   letter-spacing: 0.02em !important;
   color: #48594b !important;
@@ -540,7 +599,6 @@ html.theme-dark, body.theme-dark, #qa.theme-dark, .card.theme-dark,
   -webkit-tap-highlight-color: transparent !important;
   border: none !important;
   background: none !important;
-  white-space: nowrap !important;
   min-height: 18px !important;
   transition: opacity 0.2s ease !important;
 }
@@ -550,10 +608,11 @@ html.theme-dark, body.theme-dark, #qa.theme-dark, .card.theme-dark,
 }
 
 #bottom-time-display {
-  display: block !important;
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
   text-align: right !important;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 700 !important;
   letter-spacing: 0.03em !important;
   color: #48594b !important;
@@ -711,10 +770,11 @@ html.theme-dark, body.theme-dark, #qa.theme-dark, .card.theme-dark,
   transition: all 0.15s ease !important;
 }
 
-.fc-tab-btn.active {
-  background: #384b3e !important;
+.fc-tab-btn.active, .hud-pos-btn.active {
+  background: #1e2b20 !important;
   color: #ffffff !important;
-  border-color: #384b3e !important;
+  border-color: #1e2b20 !important;
+  font-weight: 700 !important;
 }
 
 .forecast-scope-bar {
@@ -738,9 +798,10 @@ html.theme-dark, body.theme-dark, #qa.theme-dark, .card.theme-dark,
 }
 
 .fc-scope-btn.active {
-  background: #48594b !important;
+  background: #1e2b20 !important;
   color: #ffffff !important;
-  border-color: #48594b !important;
+  border-color: #1e2b20 !important;
+  font-weight: 700 !important;
 }
 
 .forecast-content {
@@ -882,10 +943,11 @@ html.theme-dark, body.theme-dark, #qa.theme-dark, .card.theme-dark,
   color: #a3a3a3 !important;
 }
 
-.theme-dark .fc-tab-btn.active {
+.theme-dark .fc-tab-btn.active, .theme-dark .hud-pos-btn.active, html.theme-dark .fc-tab-btn.active, html.theme-dark .hud-pos-btn.active {
   background: #ff5555 !important;
   color: #ffffff !important;
   border-color: #ff5555 !important;
+  font-weight: 700 !important;
 }
 
 .theme-dark .fc-scope-btn {
@@ -930,3 +992,426 @@ html.theme-dark, body.theme-dark, #qa.theme-dark, .card.theme-dark,
   border-color: rgba(255, 255, 255, 0.12) !important;
   color: #f2f2f2 !important;
 }
+
+
+/* Pure OLED Black ONLY when theme-dark is active */
+html.theme-dark, html.theme-dark body, html.theme-dark #qa, html.theme-dark .card,
+html.theme-dark .card-box,
+html.theme-dark .night_mode, html.theme-dark .nightMode,
+html.theme-dark .night_mode .card, html.theme-dark .nightMode .card,
+html.theme-dark .night_mode .card-box, html.theme-dark .nightMode .card-box,
+html.theme-dark body.night_mode .card-box, html.theme-dark body.nightMode .card-box,
+body.theme-dark, body.theme-dark #qa, body.theme-dark .card, body.theme-dark .card-box,
+body.nightMode.theme-dark, body.night_mode.theme-dark,
+.nightMode.theme-dark #qa, .night_mode.theme-dark #qa,
+.nightMode.theme-dark .card, .night_mode.theme-dark .card,
+.nightMode.theme-dark .card-box, .night_mode.theme-dark .card-box,
+body.nightMode.theme-dark .card-box, body.night_mode.theme-dark .card-box {
+  background-color: #000000 !important;
+  color: #e5e5e5 !important;
+}
+
+html.theme-dark .phrase-en,
+html.theme-dark .word-text-overlay,
+html.theme-dark .word-text-plain,
+html.theme-dark .meaning-block,
+html.theme-dark .meaning-item,
+body.theme-dark .phrase-en,
+body.theme-dark .word-text-overlay,
+body.theme-dark .word-text-plain,
+body.theme-dark .meaning-block,
+body.theme-dark .meaning-item {
+  color: #f2f2f2 !important;
+}
+
+
+/* ============================================================
+   HUD Position & Orientation System (Bottom, Top, Left, Right)
+   ============================================================ */
+/* Default: Bottom (horizontal) */
+#screen-bottom-hud, #screen-bottom-hud.hud-pos-bottom {
+  position: fixed !important;
+  top: auto !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  flex-direction: column !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+}
+
+#screen-bottom-hud.hud-pos-bottom #bottom-info-row {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: flex-end !important;
+  padding: 0 14px 5px 14px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-track {
+  width: 100% !important;
+  height: 10px !important;
+}
+
+#screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-fill {
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(
+    to right,
+    #e17911 0%, #e17911 25%,
+    #90d312 25%, #90d312 50%,
+    #08ac5d 50%, #08ac5d 75%,
+    #1173f0 75%, #1173f0 100%
+  ) !important;
+}
+
+#screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-ticks {
+  flex-direction: row !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+#screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-ticks div {
+  flex: 1 !important;
+  border-right: 2px solid #B6BDA7 !important;
+  border-bottom: none !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
+#screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-ticks div:last-child {
+  border-right: none !important;
+}
+
+/* Position: Top (horizontal) */
+#screen-bottom-hud.hud-pos-top {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  flex-direction: column !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+}
+
+#screen-bottom-hud.hud-pos-top #screen-bottom-bar-track {
+  order: 1 !important;
+  width: 100% !important;
+  height: 10px !important;
+}
+
+#screen-bottom-hud.hud-pos-top #bottom-info-row {
+  order: 2 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  padding: 5px 14px 0 14px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#screen-bottom-hud.hud-pos-top #screen-bottom-bar-fill {
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(
+    to right,
+    #e17911 0%, #e17911 25%,
+    #90d312 25%, #90d312 50%,
+    #08ac5d 50%, #08ac5d 75%,
+    #1173f0 75%, #1173f0 100%
+  ) !important;
+}
+
+#screen-bottom-hud.hud-pos-top #screen-bottom-bar-ticks {
+  flex-direction: row !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+#screen-bottom-hud.hud-pos-top #screen-bottom-bar-ticks div {
+  flex: 1 !important;
+  border-right: 2px solid #B6BDA7 !important;
+  border-bottom: none !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
+#screen-bottom-hud.hud-pos-top #screen-bottom-bar-ticks div:last-child {
+  border-right: none !important;
+}
+
+/* Position: Left (vertical bar) */
+#screen-bottom-hud.hud-pos-left {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  width: 12px !important;
+  height: 100% !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+}
+
+#screen-bottom-hud.hud-pos-left #bottom-info-row {
+  position: fixed !important;
+  bottom: 6px !important;
+  left: 18px !important;
+  right: 14px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: flex-end !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  width: calc(100% - 32px) !important;
+  box-sizing: border-box !important;
+}
+
+#screen-bottom-hud.hud-pos-left #screen-bottom-bar-track {
+  width: 12px !important;
+  height: 100% !important;
+}
+
+#screen-bottom-hud.hud-pos-left #screen-bottom-bar-fill {
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(
+    to bottom,
+    #1173f0 0%, #1173f0 25%,
+    #08ac5d 25%, #08ac5d 50%,
+    #90d312 50%, #90d312 75%,
+    #e17911 75%, #e17911 100%
+  ) !important;
+}
+
+#screen-bottom-hud.hud-pos-left #screen-bottom-bar-ticks {
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+#screen-bottom-hud.hud-pos-left #screen-bottom-bar-ticks div {
+  flex: 1 !important;
+  border-right: none !important;
+  border-bottom: 2px solid #B6BDA7 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+#screen-bottom-hud.hud-pos-left #screen-bottom-bar-ticks div:last-child {
+  border-bottom: none !important;
+}
+
+/* Position: Right (vertical bar) */
+#screen-bottom-hud.hud-pos-right {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: auto !important;
+  right: 0 !important;
+  width: 12px !important;
+  height: 100% !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+}
+
+#screen-bottom-hud.hud-pos-right #bottom-info-row {
+  position: fixed !important;
+  bottom: 6px !important;
+  left: 14px !important;
+  right: 18px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: flex-end !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  width: calc(100% - 32px) !important;
+  box-sizing: border-box !important;
+}
+
+#screen-bottom-hud.hud-pos-right #screen-bottom-bar-track {
+  width: 12px !important;
+  height: 100% !important;
+}
+
+#screen-bottom-hud.hud-pos-right #screen-bottom-bar-fill {
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(
+    to bottom,
+    #1173f0 0%, #1173f0 25%,
+    #08ac5d 25%, #08ac5d 50%,
+    #90d312 50%, #90d312 75%,
+    #e17911 75%, #e17911 100%
+  ) !important;
+}
+
+#screen-bottom-hud.hud-pos-right #screen-bottom-bar-ticks {
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+#screen-bottom-hud.hud-pos-right #screen-bottom-bar-ticks div {
+  flex: 1 !important;
+  border-right: none !important;
+  border-bottom: 2px solid #B6BDA7 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+#screen-bottom-hud.hud-pos-right #screen-bottom-bar-ticks div:last-child {
+  border-bottom: none !important;
+}
+
+.theme-dark #screen-bottom-bar-ticks div {
+  border-color: #000000 !important;
+}
+
+/* Dynamic positioning for Dropdown Panels based on HUD position */
+html.hud-layout-top #hdr-stock-panel,
+body.hud-layout-top #hdr-stock-panel {
+  top: 54px !important;
+  bottom: auto !important;
+  right: 12px !important;
+}
+html.hud-layout-top #hdr-timer-panel,
+body.hud-layout-top #hdr-timer-panel {
+  top: 54px !important;
+  bottom: auto !important;
+  right: 12px !important;
+}
+html.hud-layout-top #hdr-prediction-panel,
+body.hud-layout-top #hdr-prediction-panel {
+  top: 54px !important;
+  bottom: auto !important;
+  left: 12px !important;
+}
+
+
+
+
+/* ============================================================
+   HUD Bar Thickness System (Thin, Normal, Thick, Huge)
+   ============================================================ */
+/* Buttons */
+.hud-thick-btn {
+  flex: 1 !important;
+  padding: 3px 2px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  border-radius: 3px !important;
+  border: 1px solid rgba(72, 89, 75, 0.28) !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #48594b !important;
+  text-align: center !important;
+  transition: all 0.15s ease !important;
+}
+
+.hud-thick-btn.active {
+  background: #1e2b20 !important;
+  color: #ffffff !important;
+  border-color: #1e2b20 !important;
+  font-weight: 700 !important;
+}
+
+.theme-dark .hud-thick-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #a3a3a3 !important;
+}
+
+.theme-dark .hud-thick-btn.active, html.theme-dark .hud-thick-btn.active {
+  background: #ff5555 !important;
+  color: #ffffff !important;
+  border-color: #ff5555 !important;
+  font-weight: 700 !important;
+}
+
+/* 1. Thin (細め): 5px horizontal / 6px vertical */
+.hud-thick-thin #screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-track,
+.hud-thick-thin #screen-bottom-hud.hud-pos-top #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thin.hud-pos-bottom #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thin.hud-pos-top #screen-bottom-bar-track {
+  height: 5px !important;
+}
+
+.hud-thick-thin #screen-bottom-hud.hud-pos-left,
+.hud-thick-thin #screen-bottom-hud.hud-pos-left #screen-bottom-bar-track,
+.hud-thick-thin #screen-bottom-hud.hud-pos-right,
+.hud-thick-thin #screen-bottom-hud.hud-pos-right #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thin.hud-pos-left,
+#screen-bottom-hud.hud-thick-thin.hud-pos-left #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thin.hud-pos-right,
+#screen-bottom-hud.hud-thick-thin.hud-pos-right #screen-bottom-bar-track {
+  width: 6px !important;
+}
+
+/* 2. Normal (標準 - default): 10px horizontal / 12px vertical */
+.hud-thick-normal #screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-track,
+.hud-thick-normal #screen-bottom-hud.hud-pos-top #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-normal.hud-pos-bottom #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-normal.hud-pos-top #screen-bottom-bar-track {
+  height: 10px !important;
+}
+
+.hud-thick-normal #screen-bottom-hud.hud-pos-left,
+.hud-thick-normal #screen-bottom-hud.hud-pos-left #screen-bottom-bar-track,
+.hud-thick-normal #screen-bottom-hud.hud-pos-right,
+.hud-thick-normal #screen-bottom-hud.hud-pos-right #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-normal.hud-pos-left,
+#screen-bottom-hud.hud-thick-normal.hud-pos-left #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-normal.hud-pos-right,
+#screen-bottom-hud.hud-thick-normal.hud-pos-right #screen-bottom-bar-track {
+  width: 12px !important;
+}
+
+/* 3. Thick (太め): 18px horizontal / 20px vertical */
+.hud-thick-thick #screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-track,
+.hud-thick-thick #screen-bottom-hud.hud-pos-top #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thick.hud-pos-bottom #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thick.hud-pos-top #screen-bottom-bar-track {
+  height: 18px !important;
+}
+
+.hud-thick-thick #screen-bottom-hud.hud-pos-left,
+.hud-thick-thick #screen-bottom-hud.hud-pos-left #screen-bottom-bar-track,
+.hud-thick-thick #screen-bottom-hud.hud-pos-right,
+.hud-thick-thick #screen-bottom-hud.hud-pos-right #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thick.hud-pos-left,
+#screen-bottom-hud.hud-thick-thick.hud-pos-left #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-thick.hud-pos-right,
+#screen-bottom-hud.hud-thick-thick.hud-pos-right #screen-bottom-bar-track {
+  width: 20px !important;
+}
+
+.hud-thick-thick.hud-layout-left .card-box, html.hud-thick-thick.hud-layout-left .card-box { padding-left: 36px !important; }
+.hud-thick-thick.hud-layout-right .card-box, html.hud-thick-thick.hud-layout-right .card-box { padding-right: 36px !important; }
+.hud-thick-thick.hud-layout-top .card-box, html.hud-thick-thick.hud-layout-top .card-box { padding-top: 66px !important; }
+
+/* 4. Huge (極太): 28px horizontal / 30px vertical */
+.hud-thick-huge #screen-bottom-hud.hud-pos-bottom #screen-bottom-bar-track,
+.hud-thick-huge #screen-bottom-hud.hud-pos-top #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-huge.hud-pos-bottom #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-huge.hud-pos-top #screen-bottom-bar-track {
+  height: 28px !important;
+}
+
+.hud-thick-huge #screen-bottom-hud.hud-pos-left,
+.hud-thick-huge #screen-bottom-hud.hud-pos-left #screen-bottom-bar-track,
+.hud-thick-huge #screen-bottom-hud.hud-pos-right,
+.hud-thick-huge #screen-bottom-hud.hud-pos-right #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-huge.hud-pos-left,
+#screen-bottom-hud.hud-thick-huge.hud-pos-left #screen-bottom-bar-track,
+#screen-bottom-hud.hud-thick-huge.hud-pos-right,
+#screen-bottom-hud.hud-thick-huge.hud-pos-right #screen-bottom-bar-track {
+  width: 30px !important;
+}
+
+.hud-thick-huge.hud-layout-left .card-box, html.hud-thick-huge.hud-layout-left .card-box { padding-left: 46px !important; }
+.hud-thick-huge.hud-layout-right .card-box, html.hud-thick-huge.hud-layout-right .card-box { padding-right: 46px !important; }
+.hud-thick-huge.hud-layout-top .card-box, html.hud-thick-huge.hud-layout-top .card-box { padding-top: 76px !important; }

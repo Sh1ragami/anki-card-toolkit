@@ -1,17 +1,41 @@
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
 <script src="_deck_forecast.js"></script>
 <style id="custom-theme-style"></style>
 <script>
 (function() {
   var isDark = false;
   try {
-    isDark = (localStorage.getItem('anki_theme_preference') === 'dark');
-  } catch(e) {}
-  if (isDark) {
-    document.documentElement.classList.add('theme-dark');
-    document.body && document.body.classList.add('theme-dark');
-    var st = document.getElementById('custom-theme-style');
-    if (st) st.textContent = `html, body, #qa, .card, .card-box { background-color: #000000 !important; color: #e5e5e5 !important; }\n.phrase-en, .word-text-overlay, .word-text-plain, .meaning-block, .meaning-item { color: #f2f2f2 !important; }\n.phrase-ja { color: #cccccc !important; }\n.target-word, .phrase-ja .target-word-ja { color: #ff5555 !important; }\n.header-bar, .word-no, .badge-level, .phonetic, .sound-btn { color: #888888 !important; }\n.sound-btn:hover, .sound-btn:active { color: #ff5555 !important; }\n.clean-divider { background: #262626 !important; }\n.pos-tag { background-color: #222222 !important; color: #ffffff !important; border: 1px solid #444444 !important; }\n.extra-info { color: #888888 !important; border-top-color: #262626 !important; }\n.equal-sub, .card-box .meaning-block .equal-sub { color: #949494 !important; }\n.bracket-sub, .card-box .meaning-block .bracket-sub { color: #6e6e6e !important; }\n.sub-meaning { color: #949494 !important; }\n.sub-meaning::before { color: #f2f2f2 !important; }\n#bottom-prediction-display { color: #a3a3a3 !important; }\n#bottom-prediction-display:hover { color: #ffffff !important; }\n#bottom-time-display { color: #a3a3a3 !important; }\n#screen-bottom-bar-track { background: rgba(255, 255, 255, 0.15) !important; }\n#screen-bottom-bar-ticks div { border-right-color: #000000 !important; }\n#hdr-prediction-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #e5e5e5 !important; }\n.fc-tab-btn { background: rgba(255, 255, 255, 0.08) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #a3a3a3 !important; }\n.fc-tab-btn.active { background: #ff5555 !important; color: #ffffff !important; border-color: #ff5555 !important; }\n.fc-scope-btn { background: rgba(255, 255, 255, 0.06) !important; border-color: rgba(255, 255, 255, 0.15) !important; color: #a3a3a3 !important; }\n.fc-scope-btn.active { background: #ff5555 !important; color: #ffffff !important; border-color: #ff5555 !important; }\n.forecast-label { color: #888888 !important; }\n.forecast-val { color: #f2f2f2 !important; }\n.forecast-val.highlight { color: #ff5555 !important; }\n.forecast-subnote { color: #666666 !important; }\n#fc-breakdown { color: #888888 !important; }\n.hdr-dropdown-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; }`;
+    var pref = localStorage.getItem('anki_theme_preference') || sessionStorage.getItem('anki_theme_preference');
+    isDark = (pref === 'dark');
+  } catch(e) {
+    try { isDark = (window.__anki_theme_preference === 'dark'); } catch(e2) {}
   }
+  var root = document.documentElement;
+  if (isDark) {
+    root.classList.add('theme-dark');
+    root.classList.remove('theme-green');
+  } else {
+    root.classList.remove('theme-dark');
+    root.classList.add('theme-green');
+  }
+  var hudPos = 'bottom';
+  try {
+    hudPos = localStorage.getItem('anki_hud_position') || sessionStorage.getItem('anki_hud_position') || 'bottom';
+  } catch(e) {}
+root.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', 'hud-layout-bottom');
+  root.classList.add('hud-layout-' + hudPos);
+  var hudThick = 'normal';
+  try {
+    hudThick = localStorage.getItem('anki_hud_thickness') || sessionStorage.getItem('anki_hud_thickness') || 'normal';
+  } catch(e) {}
+  root.classList.remove('hud-thick-thin', 'hud-thick-normal', 'hud-thick-thick', 'hud-thick-huge');
+  root.classList.add('hud-thick-' + hudThick);
+
+  var darkCss = `:root, html { color-scheme: dark !important; }\nhtml.theme-dark, html.theme-dark body, html.theme-dark #qa, html.theme-dark .card, html.theme-dark .card-box, html.theme-dark .night_mode, html.theme-dark .nightMode, html.theme-dark .night_mode .card-box, html.theme-dark .nightMode .card-box, html.theme-dark body.night_mode .card-box, html.theme-dark body.nightMode .card-box, body.theme-dark, body.theme-dark #qa, body.theme-dark .card, body.theme-dark .card-box, body.nightMode.theme-dark, body.night_mode.theme-dark, .nightMode.theme-dark #qa, .night_mode.theme-dark #qa, .nightMode.theme-dark .card, .night_mode.theme-dark .card, .nightMode.theme-dark .card-box, .night_mode.theme-dark .card-box, body.nightMode.theme-dark .card-box, body.night_mode.theme-dark .card-box { background-color: #000000 !important; color: #e5e5e5 !important; }\n.phrase-en, .word-text-overlay, .word-text-plain, .meaning-block, .meaning-item { color: #f2f2f2 !important; }\n.phrase-ja { color: #cccccc !important; }\n.target-word, .phrase-ja .target-word-ja { color: #ff5555 !important; }\n.header-bar, .word-no, .badge-level, .phonetic, .sound-btn { color: #888888 !important; }\n.sound-btn:hover, .sound-btn:active { color: #ff5555 !important; }\n.clean-divider { background: #262626 !important; }\n.pos-tag { background: rgba(255, 255, 255, 0.12) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.3) !important; border-radius: 4px !important; padding: 1px 8px !important; font-weight: 700 !important; }\n.extra-info { color: #888888 !important; border-top-color: #262626 !important; }\n.equal-sub, .card-box .meaning-block .equal-sub { color: #949494 !important; }\n.bracket-sub, .card-box .meaning-block .bracket-sub { color: #6e6e6e !important; }\n.sub-meaning { color: #949494 !important; }\n.sub-meaning::before { color: #f2f2f2 !important; }\n#bottom-prediction-display { color: #a3a3a3 !important; }\n#bottom-prediction-display:hover { color: #ffffff !important; }\n#bottom-time-display { color: #a3a3a3 !important; }\n#screen-bottom-bar-track { background: rgba(255, 255, 255, 0.15) !important; }\n#screen-bottom-bar-ticks div { border-color: #000000 !important; }\n#hdr-prediction-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #e5e5e5 !important; }\n.fc-tab-btn { background: rgba(255, 255, 255, 0.08) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #a3a3a3 !important; }\n.fc-tab-btn.active, .hud-pos-btn.active { background: #ff5555 !important; color: #ffffff !important; border-color: #ff5555 !important; font-weight: 700 !important; }\n.fc-scope-btn { background: rgba(255, 255, 255, 0.06) !important; border-color: rgba(255, 255, 255, 0.15) !important; color: #a3a3a3 !important; }\n.fc-scope-btn.active { background: #ff5555 !important; color: #ffffff !important; border-color: #ff5555 !important; font-weight: 700 !important; }\n.hud-pos-btn { background: rgba(255, 255, 255, 0.06) !important; border-color: rgba(255, 255, 255, 0.15) !important; color: #a3a3a3 !important; }\n.forecast-label { color: #888888 !important; }\n.forecast-val { color: #f2f2f2 !important; }\n.forecast-val.highlight { color: #ff5555 !important; }\n.forecast-subnote { color: #666666 !important; }\n#fc-breakdown { color: #888888 !important; }\n.hdr-dropdown-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #e5e5e5 !important; }\n.dropdown-header { color: #a3a3a3 !important; border-bottom-color: rgba(255, 255, 255, 0.12) !important; }\n.timer-menu-btn { background: rgba(255, 255, 255, 0.08) !important; color: #e5e5e5 !important; border-color: rgba(255, 255, 255, 0.16) !important; }\n.timer-menu-btn:hover { background: rgba(255, 255, 255, 0.16) !important; }`;
+  var greenCss = `:root, html { color-scheme: light dark !important; }\nhtml:not(.theme-dark), html.theme-green, html:not(.theme-dark) body, html.theme-green body, html:not(.theme-dark) #qa, html.theme-green #qa, html:not(.theme-dark) .card, html.theme-green .card, html:not(.theme-dark) .card-box, html.theme-green .card-box, html:not(.theme-dark) body.nightMode, html:not(.theme-dark) body.night_mode, html:not(.theme-dark) .nightMode #qa, html:not(.theme-dark) .night_mode #qa, html:not(.theme-dark) .nightMode .card, html:not(.theme-dark) .night_mode .card, html:not(.theme-dark) .nightMode .card-box, html:not(.theme-dark) .night_mode .card-box, html:not(.theme-dark) body.nightMode .card-box, html:not(.theme-dark) body.night_mode .card-box { background-color: #B6BDA7 !important; color: #141f17 !important; }\n.phrase-en, .word-text-overlay, .word-text-plain, .meaning-block, .meaning-item { color: #141f17 !important; }\n.phrase-ja { color: #28362b !important; }\n.target-word, .phrase-ja .target-word-ja { color: #991b1b !important; }\n.header-bar, .word-no, .badge-level, .phonetic, .sound-btn { color: #48594b !important; }\n.sound-btn:hover, .sound-btn:active { color: #991b1b !important; }\n.clean-divider { background: #9da58f !important; }\n.pos-tag { background: rgba(40, 54, 43, 0.12) !important; color: #141f17 !important; border: 1.5px solid #28362b !important; border-radius: 4px !important; padding: 1px 8px !important; font-weight: 700 !important; }\n.extra-info { color: #3e5042 !important; border-top-color: #9da58f !important; }\n.equal-sub, .card-box .meaning-block .equal-sub { color: #48594b !important; }\n.bracket-sub, .card-box .meaning-block .bracket-sub { color: #48594b !important; }\n.sub-meaning { color: #48594b !important; }\n.sub-meaning::before { color: #141f17 !important; }\n#bottom-prediction-display { color: #48594b !important; }\n#bottom-prediction-display:hover { color: #141f17 !important; }\n#bottom-time-display { color: #48594b !important; }\n#screen-bottom-bar-track { background: rgba(0, 0, 0, 0.16) !important; }\n#screen-bottom-bar-ticks div { border-color: #B6BDA7 !important; }\n#hdr-prediction-panel { background: rgba(245, 247, 242, 0.98) !important; border-color: rgba(72, 89, 75, 0.3) !important; color: #141f17 !important; }\n.fc-tab-btn { background: rgba(0, 0, 0, 0.05) !important; border-color: rgba(72, 89, 75, 0.28) !important; color: #48594b !important; }\n.fc-tab-btn.active, .hud-pos-btn.active { background: #1e2b20 !important; color: #ffffff !important; border-color: #1e2b20 !important; font-weight: 700 !important; }\n.fc-scope-btn { background: rgba(0, 0, 0, 0.05) !important; border-color: rgba(72, 89, 75, 0.28) !important; color: #48594b !important; }\n.fc-scope-btn.active { background: #1e2b20 !important; color: #ffffff !important; border-color: #1e2b20 !important; font-weight: 700 !important; }\n.hud-pos-btn { background: rgba(0, 0, 0, 0.05) !important; border-color: rgba(72, 89, 75, 0.28) !important; color: #48594b !important; }\n.forecast-label { color: #5a6e5e !important; }\n.forecast-val { color: #141f17 !important; }\n.forecast-val.highlight { color: #991b1b !important; }\n.forecast-subnote { color: #5a6e5e !important; }\n#fc-breakdown { color: #48594b !important; }\n.hdr-dropdown-panel { background: rgba(245, 247, 242, 0.98) !important; border-color: rgba(72, 89, 75, 0.3) !important; color: #141f17 !important; }\n.dropdown-header { color: #48594b !important; border-bottom-color: rgba(72, 89, 75, 0.15) !important; }\n.timer-menu-btn { background: rgba(72, 89, 75, 0.08) !important; color: #141f17 !important; border-color: rgba(72, 89, 75, 0.2) !important; }\n.timer-menu-btn:hover { background: rgba(72, 89, 75, 0.18) !important; }`;
+  var st = document.getElementById('custom-theme-style');
+  if (st) st.textContent = isDark ? darkCss : greenCss;
 })();
 </script>
 <div class="card-box">
@@ -49,6 +73,26 @@
     <button type="button" class="timer-menu-btn" onclick="window.startStudySession(45, event)">🎯 45 分集中</button>
     <button type="button" class="timer-menu-btn" onclick="window.startStudySession(60, event)">🔥 60 分集中</button>
     <button type="button" class="timer-menu-btn" id="hdr-barmode-btn" onclick="window.toggleBarMode(event)" style="border-top: 1px dashed rgba(72, 89, 75, 0.3); margin-top: 4px; padding-top: 6px;">📊 表示: ⏳ 残り勉強時間</button>
+        <!-- HUD Position Selector (Bottom, Top, Left, Right) -->
+    <div class="timer-pos-bar" style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(72, 89, 75, 0.25);">
+      <div style="font-size: 10px; font-weight: 700; color: #48594b; margin-bottom: 4px;">📍 バー配置:</div>
+      <div style="display: flex; gap: 3px;">
+        <button type="button" class="hud-pos-btn" id="hud-pos-btn-bottom" onclick="window.setHudPosition('bottom', event)" style="flex:1; padding:3px 2px; font-size:10px; font-weight:600; cursor:pointer; border-radius:3px; border:1px solid rgba(72,89,75,0.25); background:rgba(0,0,0,0.04);">下 (横)</button>
+        <button type="button" class="hud-pos-btn" id="hud-pos-btn-top" onclick="window.setHudPosition('top', event)" style="flex:1; padding:3px 2px; font-size:10px; font-weight:600; cursor:pointer; border-radius:3px; border:1px solid rgba(72,89,75,0.25); background:rgba(0,0,0,0.04);">上 (横)</button>
+        <button type="button" class="hud-pos-btn" id="hud-pos-btn-left" onclick="window.setHudPosition('left', event)" style="flex:1; padding:3px 2px; font-size:10px; font-weight:600; cursor:pointer; border-radius:3px; border:1px solid rgba(72,89,75,0.25); background:rgba(0,0,0,0.04);">左 (縦)</button>
+        <button type="button" class="hud-pos-btn" id="hud-pos-btn-right" onclick="window.setHudPosition('right', event)" style="flex:1; padding:3px 2px; font-size:10px; font-weight:600; cursor:pointer; border-radius:3px; border:1px solid rgba(72,89,75,0.25); background:rgba(0,0,0,0.04);">右 (縦)</button>
+      </div>
+    </div>
+        <!-- HUD Thickness Selector (Thin, Normal, Thick, Huge) -->
+    <div class="timer-thick-bar" style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(72, 89, 75, 0.25);">
+      <div style="font-size: 10px; font-weight: 700; color: #48594b; margin-bottom: 4px;">📏 バー太さ:</div>
+      <div style="display: flex; gap: 3px;">
+        <button type="button" class="hud-thick-btn" id="hud-thick-btn-thin" onclick="window.setHudThickness('thin', event)">細め</button>
+        <button type="button" class="hud-thick-btn" id="hud-thick-btn-normal" onclick="window.setHudThickness('normal', event)">標準</button>
+        <button type="button" class="hud-thick-btn" id="hud-thick-btn-thick" onclick="window.setHudThickness('thick', event)">太め</button>
+        <button type="button" class="hud-thick-btn" id="hud-thick-btn-huge" onclick="window.setHudThickness('huge', event)">極太</button>
+      </div>
+    </div>
     <button type="button" class="timer-menu-btn reset" onclick="window.resetStudySession(event)">🔄 タイマーリセット</button>
   </div>
 
@@ -73,7 +117,7 @@
       <div class="forecast-row"><span class="forecast-label">残り対象枚数:</span> <span class="forecast-val" id="fc-due-cards">--枚</span></div>
       <div id="fc-breakdown" style="font-size:10px; color:#6d7d6f; margin-bottom:4px; text-align:right;"></div>
       <div class="forecast-row"><span class="forecast-label">実質解答予測:</span> <span class="forecast-val" id="fc-actual-reviews">約--回</span></div>
-      <div class="forecast-subnote">※ミス・再出題率(約46%)を加味して計算</div>
+      <div class="forecast-subnote" id="fc-subnote">※ミス・再出題率(約46%)を加味して計算</div>
       <div class="forecast-row" style="margin-top:6px; border-top:1px dashed rgba(72,89,75,0.25); padding-top:6px;"><span class="forecast-label">直近ペース:</span> <span class="forecast-val" id="fc-pace">--秒/問</span></div>
     </div>
   </div>
@@ -143,9 +187,21 @@
     var tEl = document.getElementById('bottom-time-display');
     if (tEl) tEl.textContent = timeStr;
 
+    var hudPos = localStorage.getItem('anki_hud_position') || 'bottom';
+    var hudEl = document.getElementById('screen-bottom-hud');
+    if (hudEl) {
+      hudEl.className = 'hud-pos-' + hudPos;
+    }
+    document.documentElement.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', 'hud-layout-bottom');
+    document.documentElement.classList.add('hud-layout-' + hudPos);
+    if (document.body) {
+      document.body.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', 'hud-layout-bottom');
+      document.body.classList.add('hud-layout-' + hudPos);
+    }
     var fEl = document.getElementById('screen-bottom-bar-fill');
     if (fEl) {
-      var clip = 'inset(0 ' + (100 - pct) + '% 0 0)';
+      var isVertical = (hudPos === 'left' || hudPos === 'right');
+      var clip = isVertical ? ('inset(' + (100 - pct) + '% 0 0 0)') : ('inset(0 ' + (100 - pct) + '% 0 0)');
       fEl.style.clipPath = clip;
       fEl.style.webkitClipPath = clip;
     }
@@ -196,40 +252,62 @@ if (typeof playExampleAudio === 'undefined') {
   /* ============================================================
      1. Theme Toggle System
      ============================================================ */
-  var darkCss = `html, body, #qa, .card, .card-box { background-color: #000000 !important; color: #e5e5e5 !important; }\n.phrase-en, .word-text-overlay, .word-text-plain, .meaning-block, .meaning-item { color: #f2f2f2 !important; }\n.phrase-ja { color: #cccccc !important; }\n.target-word, .phrase-ja .target-word-ja { color: #ff5555 !important; }\n.header-bar, .word-no, .badge-level, .phonetic, .sound-btn { color: #888888 !important; }\n.sound-btn:hover, .sound-btn:active { color: #ff5555 !important; }\n.clean-divider { background: #262626 !important; }\n.pos-tag { background-color: #222222 !important; color: #ffffff !important; border: 1px solid #444444 !important; }\n.extra-info { color: #888888 !important; border-top-color: #262626 !important; }\n.equal-sub, .card-box .meaning-block .equal-sub { color: #949494 !important; }\n.bracket-sub, .card-box .meaning-block .bracket-sub { color: #6e6e6e !important; }\n.sub-meaning { color: #949494 !important; }\n.sub-meaning::before { color: #f2f2f2 !important; }\n#bottom-prediction-display { color: #a3a3a3 !important; }\n#bottom-prediction-display:hover { color: #ffffff !important; }\n#bottom-time-display { color: #a3a3a3 !important; }\n#screen-bottom-bar-track { background: rgba(255, 255, 255, 0.15) !important; }\n#screen-bottom-bar-ticks div { border-right-color: #000000 !important; }\n#hdr-prediction-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #e5e5e5 !important; }\n.fc-tab-btn { background: rgba(255, 255, 255, 0.08) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #a3a3a3 !important; }\n.fc-tab-btn.active { background: #ff5555 !important; color: #ffffff !important; border-color: #ff5555 !important; }\n.fc-scope-btn { background: rgba(255, 255, 255, 0.06) !important; border-color: rgba(255, 255, 255, 0.15) !important; color: #a3a3a3 !important; }\n.fc-scope-btn.active { background: #ff5555 !important; color: #ffffff !important; border-color: #ff5555 !important; }\n.forecast-label { color: #888888 !important; }\n.forecast-val { color: #f2f2f2 !important; }\n.forecast-val.highlight { color: #ff5555 !important; }\n.forecast-subnote { color: #666666 !important; }\n#fc-breakdown { color: #888888 !important; }\n.hdr-dropdown-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; }`;
+  var darkCss = `:root, html { color-scheme: dark !important; }\nhtml.theme-dark, html.theme-dark body, html.theme-dark #qa, html.theme-dark .card, html.theme-dark .card-box, html.theme-dark .night_mode, html.theme-dark .nightMode, html.theme-dark .night_mode .card-box, html.theme-dark .nightMode .card-box, html.theme-dark body.night_mode .card-box, html.theme-dark body.nightMode .card-box, body.theme-dark, body.theme-dark #qa, body.theme-dark .card, body.theme-dark .card-box, body.nightMode.theme-dark, body.night_mode.theme-dark, .nightMode.theme-dark #qa, .night_mode.theme-dark #qa, .nightMode.theme-dark .card, .night_mode.theme-dark .card, .nightMode.theme-dark .card-box, .night_mode.theme-dark .card-box, body.nightMode.theme-dark .card-box, body.night_mode.theme-dark .card-box { background-color: #000000 !important; color: #e5e5e5 !important; }\n.phrase-en, .word-text-overlay, .word-text-plain, .meaning-block, .meaning-item { color: #f2f2f2 !important; }\n.phrase-ja { color: #cccccc !important; }\n.target-word, .phrase-ja .target-word-ja { color: #ff5555 !important; }\n.header-bar, .word-no, .badge-level, .phonetic, .sound-btn { color: #888888 !important; }\n.sound-btn:hover, .sound-btn:active { color: #ff5555 !important; }\n.clean-divider { background: #262626 !important; }\n.pos-tag { background: rgba(255, 255, 255, 0.12) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.3) !important; border-radius: 4px !important; padding: 1px 8px !important; font-weight: 700 !important; }\n.extra-info { color: #888888 !important; border-top-color: #262626 !important; }\n.equal-sub, .card-box .meaning-block .equal-sub { color: #949494 !important; }\n.bracket-sub, .card-box .meaning-block .bracket-sub { color: #6e6e6e !important; }\n.sub-meaning { color: #949494 !important; }\n.sub-meaning::before { color: #f2f2f2 !important; }\n#bottom-prediction-display { color: #a3a3a3 !important; }\n#bottom-prediction-display:hover { color: #ffffff !important; }\n#bottom-time-display { color: #a3a3a3 !important; }\n#screen-bottom-bar-track { background: rgba(255, 255, 255, 0.15) !important; }\n#screen-bottom-bar-ticks div { border-color: #000000 !important; }\n#hdr-prediction-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #e5e5e5 !important; }\n.fc-tab-btn { background: rgba(255, 255, 255, 0.08) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #a3a3a3 !important; }\n.fc-tab-btn.active, .hud-pos-btn.active { background: #ff5555 !important; color: #ffffff !important; border-color: #ff5555 !important; font-weight: 700 !important; }\n.fc-scope-btn { background: rgba(255, 255, 255, 0.06) !important; border-color: rgba(255, 255, 255, 0.15) !important; color: #a3a3a3 !important; }\n.fc-scope-btn.active { background: #ff5555 !important; color: #ffffff !important; border-color: #ff5555 !important; font-weight: 700 !important; }\n.hud-pos-btn { background: rgba(255, 255, 255, 0.06) !important; border-color: rgba(255, 255, 255, 0.15) !important; color: #a3a3a3 !important; }\n.forecast-label { color: #888888 !important; }\n.forecast-val { color: #f2f2f2 !important; }\n.forecast-val.highlight { color: #ff5555 !important; }\n.forecast-subnote { color: #666666 !important; }\n#fc-breakdown { color: #888888 !important; }\n.hdr-dropdown-panel { background: rgba(18, 18, 20, 0.98) !important; border-color: rgba(255, 255, 255, 0.18) !important; color: #e5e5e5 !important; }\n.dropdown-header { color: #a3a3a3 !important; border-bottom-color: rgba(255, 255, 255, 0.12) !important; }\n.timer-menu-btn { background: rgba(255, 255, 255, 0.08) !important; color: #e5e5e5 !important; border-color: rgba(255, 255, 255, 0.16) !important; }\n.timer-menu-btn:hover { background: rgba(255, 255, 255, 0.16) !important; }`;
+  var greenCss = `:root, html { color-scheme: light dark !important; }\nhtml:not(.theme-dark), html.theme-green, html:not(.theme-dark) body, html.theme-green body, html:not(.theme-dark) #qa, html.theme-green #qa, html:not(.theme-dark) .card, html.theme-green .card, html:not(.theme-dark) .card-box, html.theme-green .card-box, html:not(.theme-dark) body.nightMode, html:not(.theme-dark) body.night_mode, html:not(.theme-dark) .nightMode #qa, html:not(.theme-dark) .night_mode #qa, html:not(.theme-dark) .nightMode .card, html:not(.theme-dark) .night_mode .card, html:not(.theme-dark) .nightMode .card-box, html:not(.theme-dark) .night_mode .card-box, html:not(.theme-dark) body.nightMode .card-box, html:not(.theme-dark) body.night_mode .card-box { background-color: #B6BDA7 !important; color: #141f17 !important; }\n.phrase-en, .word-text-overlay, .word-text-plain, .meaning-block, .meaning-item { color: #141f17 !important; }\n.phrase-ja { color: #28362b !important; }\n.target-word, .phrase-ja .target-word-ja { color: #991b1b !important; }\n.header-bar, .word-no, .badge-level, .phonetic, .sound-btn { color: #48594b !important; }\n.sound-btn:hover, .sound-btn:active { color: #991b1b !important; }\n.clean-divider { background: #9da58f !important; }\n.pos-tag { background: rgba(40, 54, 43, 0.12) !important; color: #141f17 !important; border: 1.5px solid #28362b !important; border-radius: 4px !important; padding: 1px 8px !important; font-weight: 700 !important; }\n.extra-info { color: #3e5042 !important; border-top-color: #9da58f !important; }\n.equal-sub, .card-box .meaning-block .equal-sub { color: #48594b !important; }\n.bracket-sub, .card-box .meaning-block .bracket-sub { color: #48594b !important; }\n.sub-meaning { color: #48594b !important; }\n.sub-meaning::before { color: #141f17 !important; }\n#bottom-prediction-display { color: #48594b !important; }\n#bottom-prediction-display:hover { color: #141f17 !important; }\n#bottom-time-display { color: #48594b !important; }\n#screen-bottom-bar-track { background: rgba(0, 0, 0, 0.16) !important; }\n#screen-bottom-bar-ticks div { border-color: #B6BDA7 !important; }\n#hdr-prediction-panel { background: rgba(245, 247, 242, 0.98) !important; border-color: rgba(72, 89, 75, 0.3) !important; color: #141f17 !important; }\n.fc-tab-btn { background: rgba(0, 0, 0, 0.05) !important; border-color: rgba(72, 89, 75, 0.28) !important; color: #48594b !important; }\n.fc-tab-btn.active, .hud-pos-btn.active { background: #1e2b20 !important; color: #ffffff !important; border-color: #1e2b20 !important; font-weight: 700 !important; }\n.fc-scope-btn { background: rgba(0, 0, 0, 0.05) !important; border-color: rgba(72, 89, 75, 0.28) !important; color: #48594b !important; }\n.fc-scope-btn.active { background: #1e2b20 !important; color: #ffffff !important; border-color: #1e2b20 !important; font-weight: 700 !important; }\n.hud-pos-btn { background: rgba(0, 0, 0, 0.05) !important; border-color: rgba(72, 89, 75, 0.28) !important; color: #48594b !important; }\n.forecast-label { color: #5a6e5e !important; }\n.forecast-val { color: #141f17 !important; }\n.forecast-val.highlight { color: #991b1b !important; }\n.forecast-subnote { color: #5a6e5e !important; }\n#fc-breakdown { color: #48594b !important; }\n.hdr-dropdown-panel { background: rgba(245, 247, 242, 0.98) !important; border-color: rgba(72, 89, 75, 0.3) !important; color: #141f17 !important; }\n.dropdown-header { color: #48594b !important; border-bottom-color: rgba(72, 89, 75, 0.15) !important; }\n.timer-menu-btn { background: rgba(72, 89, 75, 0.08) !important; color: #141f17 !important; border-color: rgba(72, 89, 75, 0.2) !important; }\n.timer-menu-btn:hover { background: rgba(72, 89, 75, 0.18) !important; }`;
 
   function getTheme() {
     try {
-      return localStorage.getItem('anki_theme_preference') || 'green';
-    } catch(e) {
-      return window.__anki_theme_preference || 'green';
-    }
+      var t = localStorage.getItem('anki_theme_preference');
+      if (t) return t;
+    } catch(e) {}
+    try {
+      var st = sessionStorage.getItem('anki_theme_preference');
+      if (st) return st;
+    } catch(e) {}
+    try {
+      if (window.__anki_theme_preference) return window.__anki_theme_preference;
+    } catch(e) {}
+    return 'green';
   }
 
   function setTheme(theme) {
     try {
       localStorage.setItem('anki_theme_preference', theme);
     } catch(e) {}
-    window.__anki_theme_preference = theme;
+    try {
+      sessionStorage.setItem('anki_theme_preference', theme);
+    } catch(e) {}
+    try {
+      window.__anki_theme_preference = theme;
+    } catch(e) {}
   }
 
   function applyThemeDisplay(theme) {
     var isDark = (theme === 'dark');
+    var root = document.documentElement;
+    if (isDark) {
+      root.classList.add('theme-dark');
+      root.classList.remove('theme-green');
+      if (document.body) {
+        document.body.classList.add('theme-dark');
+        document.body.classList.remove('theme-green');
+      }
+    } else {
+      root.classList.remove('theme-dark');
+      root.classList.add('theme-green');
+      if (document.body) {
+        document.body.classList.remove('theme-dark');
+        document.body.classList.add('theme-green');
+      }
+    }
+
     var styleTag = document.getElementById('custom-theme-style');
     if (!styleTag) {
       styleTag = document.createElement('style');
       styleTag.id = 'custom-theme-style';
       document.head.appendChild(styleTag);
     }
-    styleTag.textContent = isDark ? darkCss : '';
-
-    if (isDark) {
-      document.body.classList.add('theme-dark');
-      document.documentElement.classList.add('theme-dark');
-    } else {
-      document.body.classList.remove('theme-dark');
-      document.documentElement.classList.remove('theme-dark');
-    }
+    styleTag.textContent = isDark ? darkCss : greenCss;
 
     var icon = document.getElementById('hdr-theme-btn');
     if (icon) icon.textContent = isDark ? '☀️' : '🌙';
@@ -310,12 +388,110 @@ if (typeof playExampleAudio === 'undefined') {
     return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
   }
 
+  var KEY_HUD_POS = 'anki_hud_position'; // 'bottom', 'top', 'left', 'right'
+
+  function getHudPosition() {
+    try {
+      return localStorage.getItem(KEY_HUD_POS) || 'bottom';
+    } catch(e) {
+      return 'bottom';
+    }
+  }
+
+  function applyHudPosition(pos) {
+    var hud = document.getElementById('screen-bottom-hud');
+    if (hud) {
+      hud.className = 'hud-pos-' + pos;
+    }
+    if (document.body) {
+      document.documentElement.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', 'hud-layout-bottom');
+      document.documentElement.classList.add('hud-layout-' + pos);
+      if (document.body) {
+        document.body.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', 'hud-layout-bottom');
+        document.body.classList.add('hud-layout-' + pos);
+      }
+    }
+    var positions = ['bottom', 'top', 'left', 'right'];
+    positions.forEach(function(p) {
+      var btn = document.getElementById('hud-pos-btn-' + p);
+      if (btn) {
+        if (p === pos) {
+          btn.classList.add('active');
+          btn.style.background = '';
+          btn.style.color = '';
+        } else {
+          btn.classList.remove('active');
+          btn.style.background = '';
+          btn.style.color = '';
+        }
+      }
+    });
+  }
+
+  window.setHudPosition = function(pos, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    try {
+      localStorage.setItem(KEY_HUD_POS, pos);
+    } catch(err) {}
+    applyHudPosition(pos);
+    tick();
+    return false;
+  };
+
+  var KEY_HUD_THICK = 'anki_hud_thickness'; // 'thin', 'normal', 'thick', 'huge'
+
+  function getHudThickness() {
+    try {
+      return localStorage.getItem(KEY_HUD_THICK) || sessionStorage.getItem(KEY_HUD_THICK) || window.__anki_hud_thickness || 'normal';
+    } catch(e) {
+      return 'normal';
+    }
+  }
+
+  function applyHudThickness(thick) {
+    var root = document.documentElement;
+    root.classList.remove('hud-thick-thin', 'hud-thick-normal', 'hud-thick-thick', 'hud-thick-huge');
+    root.classList.add('hud-thick-' + thick);
+    if (document.body) {
+      document.body.classList.remove('hud-thick-thin', 'hud-thick-normal', 'hud-thick-thick', 'hud-thick-huge');
+      document.body.classList.add('hud-thick-' + thick);
+    }
+    var hud = document.getElementById('screen-bottom-hud');
+    if (hud) {
+      hud.classList.remove('hud-thick-thin', 'hud-thick-normal', 'hud-thick-thick', 'hud-thick-huge');
+      hud.classList.add('hud-thick-' + thick);
+    }
+    var thicknesses = ['thin', 'normal', 'thick', 'huge'];
+    thicknesses.forEach(function(t) {
+      var btn = document.getElementById('hud-thick-btn-' + t);
+      if (btn) {
+        if (t === thick) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      }
+    });
+  }
+
+  window.setHudThickness = function(thick, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    try { localStorage.setItem(KEY_HUD_THICK, thick); } catch(err) {}
+    try { sessionStorage.setItem(KEY_HUD_THICK, thick); } catch(err) {}
+    try { window.__anki_hud_thickness = thick; } catch(err) {}
+    applyHudThickness(thick);
+    return false;
+  };
+
+
   function setBarProgress(ratio) {
     var bar = document.getElementById('screen-bottom-bar-fill');
     if (!bar) return;
     var clampedRatio = Math.max(0, Math.min(1, ratio));
     var pct = (clampedRatio * 100).toFixed(2);
-    var clip = 'inset(0 ' + (100 - pct) + '% 0 0)';
+    var pos = getHudPosition();
+    var isVertical = (pos === 'left' || pos === 'right');
+    var clip = isVertical ? ('inset(' + (100 - pct) + '% 0 0 0)') : ('inset(0 ' + (100 - pct) + '% 0 0)');
     bar.style.clipPath = clip;
     bar.style.webkitClipPath = clip;
   }
@@ -348,6 +524,8 @@ if (typeof playExampleAudio === 'undefined') {
     }
   }
 
+  applyHudPosition(getHudPosition());
+  applyHudThickness(getHudThickness());
   tick();
   updateBarModeUI();
 
@@ -366,6 +544,7 @@ if (typeof playExampleAudio === 'undefined') {
     if (predPanel) predPanel.style.display = 'none';
     if (!menu) return false;
     updateBarModeUI();
+    applyHudPosition(getHudPosition());
     menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
     return false;
   };
@@ -662,14 +841,15 @@ if (typeof playExampleAudio === 'undefined') {
 
     if (lastLoad > 0) {
       var diffSec = (now - lastLoad) / 1000;
-      if (diffSec >= 0.8 && diffSec <= 45) {
+      // Filter out long pauses (AFK / looking away > 25s) and ultra fast accidental touches (< 1.0s)
+      if (diffSec >= 1.0 && diffSec <= 25.0) {
         var times = [];
         try {
           var raw = JSON.parse(localStorage.getItem(KEY_FC_TIMES) || '[]');
           if (Array.isArray(raw)) times = raw;
         } catch(e) {}
         times.push(diffSec);
-        if (times.length > 25) times.shift();
+        if (times.length > 50) times.shift(); // Keep up to 50 cards
         try {
           localStorage.setItem(KEY_FC_TIMES, JSON.stringify(times));
         } catch(e) {}
@@ -688,40 +868,61 @@ if (typeof playExampleAudio === 'undefined') {
     } catch(e) {}
   }
 
+  /* Dynamic Revlog Stats + Robust Trimmed-Mean & Bayesian Smoothing Estimator */
   function getEffectivePace() {
+    var fStats = (typeof window.__ANKI_FORECAST_DATA__ !== 'undefined' && window.__ANKI_FORECAST_DATA__.stats) ? window.__ANKI_FORECAST_DATA__.stats : null;
+
+    var dynAgainRate = (fStats && fStats.againRate) ? fStats.againRate : BASELINE_AGAIN_RATE;
+    var dynMultiplier = (fStats && fStats.multiplier) ? fStats.multiplier : BASE_MULTIPLIER;
+    var dynBaseFlip = (fStats && fStats.avgFlipSec) ? fStats.avgFlipSec : BASELINE_FLIP_SEC;
+    var dynExpectedSec = (fStats && fStats.expectedSecPerCard) ? fStats.expectedSecPerCard : BASE_EXPECTED_SEC_PER_CARD;
+
     var times = [];
     try {
       var raw = JSON.parse(localStorage.getItem(KEY_FC_TIMES) || '[]');
       if (Array.isArray(raw)) {
         for (var k = 0; k < raw.length; k++) {
           var t = parseFloat(raw[k]);
-          if (!isNaN(t) && t >= 0.5 && t <= 60) times.push(t);
+          if (!isNaN(t) && t >= 1.0 && t <= 25.0) times.push(t);
         }
       }
     } catch(e) {}
 
-    var paceSecPerCard = BASE_EXPECTED_SEC_PER_CARD;
-    var avgFlipSec = BASELINE_FLIP_SEC;
+    var paceSecPerCard = dynExpectedSec;
+    var displaySecPerCard = dynBaseFlip;
 
-    if (times.length >= 3) {
+    if (times.length >= 5) {
+      // 1. Sort times and apply 15% Trimmed Mean (discard extreme outliers)
+      var sorted = times.slice().sort(function(a, b) { return a - b; });
+      var trimCount = Math.floor(sorted.length * 0.15);
+      var trimmed = sorted.slice(trimCount, sorted.length - trimCount);
+      if (trimmed.length === 0) trimmed = sorted;
+
       var sum = 0;
-      for (var i = 0; i < times.length; i++) sum += times[i];
-      var calcAvg = sum / times.length;
-      if (!isNaN(calcAvg) && calcAvg > 0) {
-        avgFlipSec = calcAvg;
-        var ratio = avgFlipSec / BASELINE_FLIP_SEC;
-        ratio = Math.max(0.5, Math.min(2.0, ratio));
-        paceSecPerCard = BASE_EXPECTED_SEC_PER_CARD * (0.7 * ratio + 0.3);
-      }
+      for (var i = 0; i < trimmed.length; i++) sum += trimmed[i];
+      var observedAvg = sum / trimmed.length;
+
+      // 2. Bayesian Confidence Weighting anchored to dynamic revlog baseline
+      var confidence = Math.min(1.0, times.length / 30);
+      var wObserved = 0.40 * confidence;
+      var smoothedAvg = (1 - wObserved) * dynBaseFlip + wObserved * observedAvg;
+
+      // Bound variation to +/- 25% of baseline pace
+      smoothedAvg = Math.max(dynBaseFlip * 0.75, Math.min(dynBaseFlip * 1.25, smoothedAvg));
+      displaySecPerCard = smoothedAvg;
+
+      var paceRatio = smoothedAvg / dynBaseFlip;
+      paceSecPerCard = dynExpectedSec * paceRatio;
     }
 
-    if (isNaN(paceSecPerCard) || paceSecPerCard <= 0) paceSecPerCard = BASE_EXPECTED_SEC_PER_CARD;
-    if (isNaN(avgFlipSec) || avgFlipSec <= 0) avgFlipSec = BASELINE_FLIP_SEC;
+    if (isNaN(paceSecPerCard) || paceSecPerCard <= 0) paceSecPerCard = dynExpectedSec;
+    if (isNaN(displaySecPerCard) || displaySecPerCard <= 0) displaySecPerCard = dynBaseFlip;
 
     return {
       paceSecPerCard: paceSecPerCard,
-      avgFlipSec: avgFlipSec,
-      multiplier: BASE_MULTIPLIER
+      avgFlipSec: displaySecPerCard,
+      multiplier: dynMultiplier,
+      againRate: dynAgainRate
     };
   }
 
@@ -809,7 +1010,7 @@ if (typeof playExampleAudio === 'undefined') {
       var clockStr = formatFinishClock(finishDate);
 
       // Left Bottom Display
-      dispEl.textContent = '🏁 ' + modePrefix + '予測:' + scopeTag + durationStr + ' (残' + formatNum(due) + '枚)';
+      dispEl.textContent = '🏁 ' + (mode === 'all_cards' ? '全完走: ' : '') + (scope === 'part' ? '[Part] ' : '') + durationStr + ' (残' + formatNum(due) + '枚)';
 
       // Detail Panel elements
       var fFinish = document.getElementById('fc-finish-time');
@@ -824,6 +1025,12 @@ if (typeof playExampleAudio === 'undefined') {
       if (fDue) fDue.textContent = formatNum(due) + '枚';
       if (fActual) fActual.textContent = '約' + formatNum(actualReviews) + '回';
       if (fPace) fPace.textContent = paceInfo.avgFlipSec.toFixed(1) + '秒/問';
+
+      var fSubnote = document.getElementById('fc-subnote');
+      if (fSubnote) {
+        var pct = Math.round(paceInfo.againRate * 100);
+        fSubnote.textContent = '※ミス・再出題率(約' + pct + '%)を加味して計算';
+      }
 
       if (fBreakdown) {
         if (mode === 'today') {
@@ -875,3 +1082,4 @@ if (typeof playExampleAudio === 'undefined') {
   });
 })();
 </script>
+

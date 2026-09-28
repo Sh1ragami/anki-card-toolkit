@@ -54,12 +54,84 @@
     return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
   }
 
+  var KEY_HUD_POS = 'anki_hud_position'; // 'bottom', 'top', 'left', 'right'
+  var KEY_HUD_THICK = 'anki_hud_thickness'; // 'thin', 'normal', 'thick', 'huge'
+
+  function getHudPosition() {
+    try {
+      return localStorage.getItem(KEY_HUD_POS) || sessionStorage.getItem(KEY_HUD_POS) || 'bottom';
+    } catch(e) {
+      return 'bottom';
+    }
+  }
+
+  function applyHudPosition(pos) {
+    var hud = document.getElementById('screen-bottom-hud');
+    if (hud) hud.className = 'hud-pos-' + pos;
+    document.documentElement.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', 'hud-layout-bottom');
+    document.documentElement.classList.add('hud-layout-' + pos);
+    var positions = ['bottom', 'top', 'left', 'right'];
+    positions.forEach(function(p) {
+      var btn = document.getElementById('hud-pos-btn-' + p);
+      if (btn) {
+        if (p === pos) btn.classList.add('active');
+        else btn.classList.remove('active');
+      }
+    });
+  }
+
+  window.setHudPosition = function(pos, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    try { localStorage.setItem(KEY_HUD_POS, pos); } catch(err) {}
+    try { sessionStorage.setItem(KEY_HUD_POS, pos); } catch(err) {}
+    applyHudPosition(pos);
+    tick();
+    return false;
+  };
+
+  function getHudThickness() {
+    try {
+      return localStorage.getItem(KEY_HUD_THICK) || sessionStorage.getItem(KEY_HUD_THICK) || 'normal';
+    } catch(e) {
+      return 'normal';
+    }
+  }
+
+  function applyHudThickness(thick) {
+    var root = document.documentElement;
+    root.classList.remove('hud-thick-thin', 'hud-thick-normal', 'hud-thick-thick', 'hud-thick-huge');
+    root.classList.add('hud-thick-' + thick);
+    var hud = document.getElementById('screen-bottom-hud');
+    if (hud) {
+      hud.classList.remove('hud-thick-thin', 'hud-thick-normal', 'hud-thick-thick', 'hud-thick-huge');
+      hud.classList.add('hud-thick-' + thick);
+    }
+    var thicknesses = ['thin', 'normal', 'thick', 'huge'];
+    thicknesses.forEach(function(t) {
+      var btn = document.getElementById('hud-thick-btn-' + t);
+      if (btn) {
+        if (t === thick) btn.classList.add('active');
+        else btn.classList.remove('active');
+      }
+    });
+  }
+
+  window.setHudThickness = function(thick, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    try { localStorage.setItem(KEY_HUD_THICK, thick); } catch(err) {}
+    try { sessionStorage.setItem(KEY_HUD_THICK, thick); } catch(err) {}
+    applyHudThickness(thick);
+    return false;
+  };
+
   function setBarProgress(ratio) {
     var bar = document.getElementById('screen-bottom-bar-fill');
     if (!bar) return;
     var clampedRatio = Math.max(0, Math.min(1, ratio));
     var pct = (clampedRatio * 100).toFixed(2);
-    var clip = 'inset(0 ' + (100 - pct) + '% 0 0)';
+    var pos = getHudPosition();
+    var isVertical = (pos === 'left' || pos === 'right');
+    var clip = isVertical ? ('inset(' + (100 - pct) + '% 0 0 0)') : ('inset(0 ' + (100 - pct) + '% 0 0)');
     bar.style.clipPath = clip;
     bar.style.webkitClipPath = clip;
   }
@@ -86,6 +158,8 @@
     }
   }
 
+  applyHudPosition(getHudPosition());
+  applyHudThickness(getHudThickness());
   tick();
   updateBarModeUI();
 
