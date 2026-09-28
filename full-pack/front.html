@@ -876,15 +876,27 @@ if (typeof playExampleAudio === 'undefined') {
     var list = getStockList();
     var btn = document.getElementById('hdr-clip-btn');
 
-    if (!list.includes(itemStr)) {
-      list.push(itemStr);
-      setStockList(list);
-      if (btn) {
-        btn.textContent = '✅';
-        setTimeout(function() { btn.textContent = '📎'; }, 800);
-      }
-    } else {
+    var now = Date.now();
+    var lastTime = parseInt(sessionStorage.getItem('anki_clip_time') || '0', 10);
+    var lastWord = sessionStorage.getItem('anki_clip_word') || '';
+
+    // Prevent double click within 10 seconds for the EXACT same string, 
+    // but allow saving if it's the same word on a different card seen later.
+    if (itemStr === lastWord && (now - lastTime) < 10000) {
       window.toggleStockPanel(e);
+      return false;
+    }
+
+    list.push(itemStr);
+    setStockList(list);
+    try {
+      sessionStorage.setItem('anki_clip_time', now.toString());
+      sessionStorage.setItem('anki_clip_word', itemStr);
+    } catch(err) {}
+
+    if (btn) {
+      btn.textContent = '✅';
+      setTimeout(function() { btn.textContent = '📎'; }, 800);
     }
     return false;
   };
@@ -949,20 +961,46 @@ if (typeof playExampleAudio === 'undefined') {
     var text = list.join('\n');
     var btn = document.getElementById('hdr-copy-btn');
 
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function() {
-        if (btn) btn.textContent = 'COPIED!';
-        setTimeout(function() { if (btn) btn.textContent = '📋 COPY'; }, 1000);
-      });
-    } else {
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
+    var successCb = function() {
       if (btn) btn.textContent = 'COPIED!';
       setTimeout(function() { if (btn) btn.textContent = '📋 COPY'; }, 1000);
+    };
+    var failCb = function() {
+      if (btn) btn.textContent = 'FAIL';
+      setTimeout(function() { if (btn) btn.textContent = '📋 COPY'; }, 1000);
+    };
+
+    var fallbackCopy = function() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.top = '0';
+      ta.style.left = '0';
+      ta.style.width = '2em';
+      ta.style.height = '2em';
+      ta.style.padding = '0';
+      ta.style.border = 'none';
+      ta.style.outline = 'none';
+      ta.style.boxShadow = 'none';
+      ta.style.background = 'transparent';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try { ta.setSelectionRange(0, 99999); } catch(err) {}
+      try {
+        var successful = document.execCommand('copy');
+        if (successful) successCb();
+        else failCb();
+      } catch (err) {
+        failCb();
+      }
+      document.body.removeChild(ta);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(successCb).catch(fallbackCopy);
+    } else {
+      fallbackCopy();
     }
     return false;
   };
