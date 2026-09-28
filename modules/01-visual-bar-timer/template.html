@@ -69,6 +69,13 @@
 /* Synchronous Instant Paint - Eliminates any card-flip flickering */
 (function() {
   try {
+    if (window.__anki_timer_raf_id) {
+      cancelAnimationFrame(window.__anki_timer_raf_id);
+      window.__anki_timer_raf_id = null;
+    }
+    window.__anki_timer_render_id = (window.__anki_timer_render_id || 0) + 1;
+  } catch(e) {}
+  try {
     var endTime = parseInt(localStorage.getItem('anki_study_session_end') || '0', 10);
     var totalMs = parseInt(localStorage.getItem('anki_study_session_total') || '1500000', 10);
     var mode = localStorage.getItem('anki_bar_mode') || 'session';

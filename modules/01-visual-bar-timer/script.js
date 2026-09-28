@@ -303,11 +303,23 @@
   tick();
   updateBarModeUI();
 
-  function loop() {
-    tick();
-    requestAnimationFrame(loop);
+  // Ensure only ONE timer loop is ever active across Anki card transitions
+  window.__anki_timer_render_id = (window.__anki_timer_render_id || 0) + 1;
+  var thisRenderId = window.__anki_timer_render_id;
+
+  if (window.__anki_timer_raf_id) {
+    cancelAnimationFrame(window.__anki_timer_raf_id);
+    window.__anki_timer_raf_id = null;
   }
-  requestAnimationFrame(loop);
+
+  function loop() {
+    if (thisRenderId !== window.__anki_timer_render_id) {
+      return; // Obsolete loop from an older card: exit permanently
+    }
+    tick();
+    window.__anki_timer_raf_id = requestAnimationFrame(loop);
+  }
+  window.__anki_timer_raf_id = requestAnimationFrame(loop);
 
   window.toggleSessionMenu = function(e) {
     if (e) { e.stopPropagation(); e.preventDefault(); }
