@@ -244,14 +244,18 @@
 
   function setBarProgress(ratio) {
     var bar = document.getElementById('screen-bottom-bar-fill');
-    if (!bar) return;
     var clampedRatio = Math.max(0, Math.min(1, ratio));
     var pct = (clampedRatio * 100).toFixed(2);
     var pos = getHudPosition();
     var isVertical = (pos === 'left' || pos === 'right');
     var clip = isVertical ? ('inset(' + (100 - pct) + '% 0 0 0)') : ('inset(0 ' + (100 - pct) + '% 0 0)');
-    bar.style.clipPath = clip;
-    bar.style.webkitClipPath = clip;
+    if (bar) {
+      bar.style.clipPath = clip;
+      bar.style.webkitClipPath = clip;
+    }
+    try {
+      document.documentElement.style.setProperty('--bar-clip-path', clip);
+    } catch(err) {}
   }
 
   function tick() {
@@ -270,10 +274,11 @@
     var alertEnabled = getHudAlert();
 
     if (isFinished && alertEnabled) {
-      if (textEl) textEl.classList.add('timer-finished');
       if (!isAlertDismissed()) {
+        if (textEl) textEl.classList.add('timer-finished');
         showTimerToast();
       } else {
+        if (textEl) textEl.classList.remove('timer-finished');
         hideTimerToast();
       }
     } else {

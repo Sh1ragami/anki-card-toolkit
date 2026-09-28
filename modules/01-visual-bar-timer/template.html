@@ -90,22 +90,49 @@
     var tEl = document.getElementById('bottom-time-display');
     if (tEl) tEl.textContent = timeStr;
 
+    var hudPos = localStorage.getItem('anki_hud_position') || 'bottom';
+    var hudEl = document.getElementById('screen-bottom-hud');
+    if (hudEl) {
+      hudEl.className = 'hud-pos-' + hudPos;
+    }
+    document.documentElement.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', 'hud-layout-bottom');
+    document.documentElement.classList.add('hud-layout-' + hudPos);
+    var hudThick = localStorage.getItem('anki_hud_thickness') || sessionStorage.getItem('anki_hud_thickness') || 'normal';
+    document.documentElement.classList.remove('hud-thick-thin', 'hud-thick-normal', 'hud-thick-thick', 'hud-thick-huge');
+    document.documentElement.classList.add('hud-thick-' + hudThick);
+    if (hudEl) {
+      hudEl.classList.remove('hud-thick-thin', 'hud-thick-normal', 'hud-thick-thick', 'hud-thick-huge');
+      hudEl.classList.add('hud-thick-' + hudThick);
+    }
+    if (document.body) {
+      document.body.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', 'hud-layout-bottom');
+      document.body.classList.add('hud-layout-' + hudPos);
+    }
+
     var fEl = document.getElementById('screen-bottom-bar-fill');
+    var isVertical = (hudPos === 'left' || hudPos === 'right');
+    var clip = isVertical ? ('inset(' + (100 - pct) + '% 0 0 0)') : ('inset(0 ' + (100 - pct) + '% 0 0)');
     if (fEl) {
-      var clip = 'inset(0 ' + (100 - pct) + '% 0 0)';
       fEl.style.clipPath = clip;
       fEl.style.webkitClipPath = clip;
     }
+    try {
+      document.documentElement.style.setProperty('--bar-clip-path', clip);
+    } catch(err) {}
 
     var alertOn = (localStorage.getItem('anki_hud_alert') || sessionStorage.getItem('anki_hud_alert')) !== 'off';
     var dismissed = localStorage.getItem('anki_timer_alert_dismissed') || sessionStorage.getItem('anki_timer_alert_dismissed') || window.__anki_timer_alert_dismissed;
-    if (endTime > 0 && remSec <= 0 && alertOn && dismissed !== endTime.toString()) {
+    var isFinished = (endTime > 0 && remSec <= 0);
+    var isDismissed = (dismissed === endTime.toString());
+    if (isFinished && alertOn && !isDismissed) {
       var toast = document.getElementById('timer-finish-toast');
       if (toast) {
         toast.classList.add('show');
         toast.style.setProperty('display', 'flex', 'important');
       }
       if (tEl) tEl.classList.add('timer-finished');
+    } else {
+      if (tEl) tEl.classList.remove('timer-finished');
     }
   } catch(e) {}
 })();
