@@ -51,3 +51,6 @@ Anki Desktop、AnkiMobile（iOS）、AnkiDroid（Android）に対応。
 ## ライセンス
 
 [MIT](LICENSE)
+
+### Troubleshooting
+- **日本語訳のハイライトが反映されない**: `Example_JA` の翻訳が意訳されすぎている場合や、第二語義が採用されている場合、スクリプトがマッチしないことがあります。その場合は、Ankiの編集画面で `Example_JA` フィールド内の対象語句を手動で `<span class="target-word-ja">対象語句</span>` で囲んでください。手動設定が優先されます。
