@@ -126,6 +126,7 @@
 
   var KEY_HUD_ALERT = 'anki_hud_alert'; // 'on' or 'off'
   var KEY_ALERT_DISMISSED = 'anki_timer_alert_dismissed';
+  var dismissedEndTime = 0;
 
   function getHudAlert() {
     try {
@@ -156,7 +157,10 @@
   }
 
   window.setHudAlert = function(enabled, e) {
-    if (e) { e.stopPropagation(); e.preventDefault(); }
+    if (e) {
+      if (e.stopPropagation) e.stopPropagation();
+      if (e.preventDefault) e.preventDefault();
+    }
     var val = enabled ? 'on' : 'off';
     try { localStorage.setItem(KEY_HUD_ALERT, val); } catch(err) {}
     try { sessionStorage.setItem(KEY_HUD_ALERT, val); } catch(err) {}
@@ -166,7 +170,9 @@
   };
 
   function isAlertDismissed() {
+    if (dismissedEndTime && dismissedEndTime === session.endTime) return true;
     try {
+      if (window.__anki_timer_alert_dismissed && window.__anki_timer_alert_dismissed === session.endTime.toString()) return true;
       var dis = localStorage.getItem(KEY_ALERT_DISMISSED) || sessionStorage.getItem(KEY_ALERT_DISMISSED);
       return dis === session.endTime.toString();
     } catch(e) {
@@ -189,21 +195,37 @@
   }
 
   window.dismissTimerToast = function(e) {
-    if (e) { e.stopPropagation(); e.preventDefault(); }
+    if (e) {
+      if (e.stopPropagation) e.stopPropagation();
+      if (e.preventDefault) e.preventDefault();
+    }
+    dismissedEndTime = session.endTime;
     try {
       localStorage.setItem(KEY_ALERT_DISMISSED, session.endTime.toString());
       sessionStorage.setItem(KEY_ALERT_DISMISSED, session.endTime.toString());
+      window.__anki_timer_alert_dismissed = session.endTime.toString();
     } catch(err) {}
     hideTimerToast();
     return false;
   };
 
   window.startStudyBreak = function(mins, e) {
-    if (e) { e.stopPropagation(); e.preventDefault(); }
+    if (e) {
+      if (e.stopPropagation) e.stopPropagation();
+      if (e.preventDefault) e.preventDefault();
+    }
     window.startStudySession(mins || 5, e);
     window.dismissTimerToast(e);
     return false;
   };
+
+  function bindToastEvents() {
+    var closeBtn = document.getElementById('toast-close-btn');
+    if (closeBtn) {
+      closeBtn.onclick = window.dismissTimerToast;
+      closeBtn.ontouchstart = window.dismissTimerToast;
+    }
+  }
 
   function setBarProgress(ratio) {
     var bar = document.getElementById('screen-bottom-bar-fill');
@@ -257,6 +279,7 @@
   applyHudPosition(getHudPosition());
   applyHudThickness(getHudThickness());
   applyHudAlert(getHudAlert());
+  bindToastEvents();
   tick();
   updateBarModeUI();
 
@@ -283,6 +306,7 @@
     var totalMs = mins * 60 * 1000;
     session.totalMs = totalMs;
     session.endTime = Date.now() + totalMs;
+    dismissedEndTime = 0;
     try {
       localStorage.setItem(KEY_END, session.endTime.toString());
       localStorage.setItem(KEY_TOTAL, totalMs.toString());
@@ -290,6 +314,7 @@
       sessionStorage.setItem(KEY_TOTAL, totalMs.toString());
       localStorage.removeItem(KEY_ALERT_DISMISSED);
       sessionStorage.removeItem(KEY_ALERT_DISMISSED);
+      window.__anki_timer_alert_dismissed = '';
     } catch(err) {}
     hideTimerToast();
     var textEl = document.getElementById('bottom-time-display');
@@ -302,6 +327,7 @@
 
   window.resetStudySession = function(e) {
     if (e) { e.stopPropagation(); e.preventDefault(); }
+    dismissedEndTime = 0;
     try {
       localStorage.removeItem(KEY_END);
       localStorage.removeItem(KEY_TOTAL);
@@ -309,6 +335,7 @@
       sessionStorage.removeItem(KEY_END);
       sessionStorage.removeItem(KEY_TOTAL);
       sessionStorage.removeItem(KEY_ALERT_DISMISSED);
+      window.__anki_timer_alert_dismissed = '';
     } catch(err) {}
     session = initSession();
     hideTimerToast();

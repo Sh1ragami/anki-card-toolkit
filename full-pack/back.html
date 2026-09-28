@@ -177,15 +177,16 @@ root.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', '
   {{/Extra_Info}}
 </div>
 
-<!-- Timer Finish Toast Banner -->
-<div id="timer-finish-toast" class="timer-finish-toast" onclick="window.dismissTimerToast(event)" style="display: none;">
-  <div class="toast-icon">⏰</div>
-  <div class="toast-body">
-    <div class="toast-title">TIME UP!</div>
+<!-- Timer Finish Notification Banner (Deck-Harmonized Design) -->
+<div id="timer-finish-toast" class="timer-finish-toast" style="display: none;">
+  <div class="toast-content">
+    <div class="toast-title">⏳ SESSION COMPLETE</div>
     <div class="toast-desc">セッション終了・お疲れ様でした</div>
   </div>
-  <button type="button" class="toast-action-btn" onclick="window.startStudyBreak(5, event)" title="5分休憩をスタート">☕ 5分休憩</button>
-  <button type="button" class="toast-close-btn" onclick="window.dismissTimerToast(event)" title="閉じる">&times;</button>
+  <div class="toast-actions">
+    <button type="button" class="toast-break-btn" onclick="window.startStudyBreak(5, event)" ontouchstart="window.startStudyBreak(5, event)">☕ 5分休憩</button>
+    <button type="button" class="toast-close-btn" id="toast-close-btn" onclick="window.dismissTimerToast(event)" ontouchstart="window.dismissTimerToast(event)" title="閉じる" aria-label="閉じる">✕</button>
+  </div>
 </div>
 
 <!-- Screen Bottom HUD: Forecast + Timer + King Jim VBT20 4-Color Gradient Bar -->
@@ -542,6 +543,7 @@ if (typeof playExampleAudio === 'undefined') {
 
   var KEY_HUD_ALERT = 'anki_hud_alert'; // 'on' or 'off'
   var KEY_ALERT_DISMISSED = 'anki_timer_alert_dismissed';
+  var dismissedEndTime = 0;
 
   function getHudAlert() {
     try {
@@ -572,7 +574,10 @@ if (typeof playExampleAudio === 'undefined') {
   }
 
   window.setHudAlert = function(enabled, e) {
-    if (e) { e.stopPropagation(); e.preventDefault(); }
+    if (e) {
+      if (e.stopPropagation) e.stopPropagation();
+      if (e.preventDefault) e.preventDefault();
+    }
     var val = enabled ? 'on' : 'off';
     try { localStorage.setItem(KEY_HUD_ALERT, val); } catch(err) {}
     try { sessionStorage.setItem(KEY_HUD_ALERT, val); } catch(err) {}
@@ -582,7 +587,9 @@ if (typeof playExampleAudio === 'undefined') {
   };
 
   function isAlertDismissed() {
+    if (dismissedEndTime && dismissedEndTime === session.endTime) return true;
     try {
+      if (window.__anki_timer_alert_dismissed && window.__anki_timer_alert_dismissed === session.endTime.toString()) return true;
       var dis = localStorage.getItem(KEY_ALERT_DISMISSED) || sessionStorage.getItem(KEY_ALERT_DISMISSED);
       return dis === session.endTime.toString();
     } catch(e) {
@@ -605,21 +612,37 @@ if (typeof playExampleAudio === 'undefined') {
   }
 
   window.dismissTimerToast = function(e) {
-    if (e) { e.stopPropagation(); e.preventDefault(); }
+    if (e) {
+      if (e.stopPropagation) e.stopPropagation();
+      if (e.preventDefault) e.preventDefault();
+    }
+    dismissedEndTime = session.endTime;
     try {
       localStorage.setItem(KEY_ALERT_DISMISSED, session.endTime.toString());
       sessionStorage.setItem(KEY_ALERT_DISMISSED, session.endTime.toString());
+      window.__anki_timer_alert_dismissed = session.endTime.toString();
     } catch(err) {}
     hideTimerToast();
     return false;
   };
 
   window.startStudyBreak = function(mins, e) {
-    if (e) { e.stopPropagation(); e.preventDefault(); }
+    if (e) {
+      if (e.stopPropagation) e.stopPropagation();
+      if (e.preventDefault) e.preventDefault();
+    }
     window.startStudySession(mins || 5, e);
     window.dismissTimerToast(e);
     return false;
   };
+
+  function bindToastEvents() {
+    var closeBtn = document.getElementById('toast-close-btn');
+    if (closeBtn) {
+      closeBtn.onclick = window.dismissTimerToast;
+      closeBtn.ontouchstart = window.dismissTimerToast;
+    }
+  }
 
   function setBarProgress(ratio) {
     var bar = document.getElementById('screen-bottom-bar-fill');
@@ -679,6 +702,7 @@ if (typeof playExampleAudio === 'undefined') {
   applyHudPosition(getHudPosition());
   applyHudThickness(getHudThickness());
   applyHudAlert(getHudAlert());
+  bindToastEvents();
   tick();
   updateBarModeUI();
 
@@ -709,6 +733,7 @@ if (typeof playExampleAudio === 'undefined') {
     var totalMs = mins * 60 * 1000;
     session.totalMs = totalMs;
     session.endTime = Date.now() + totalMs;
+    dismissedEndTime = 0;
     try {
       localStorage.setItem(KEY_END, session.endTime.toString());
       localStorage.setItem(KEY_TOTAL, totalMs.toString());
@@ -716,6 +741,7 @@ if (typeof playExampleAudio === 'undefined') {
       sessionStorage.setItem(KEY_TOTAL, totalMs.toString());
       localStorage.removeItem(KEY_ALERT_DISMISSED);
       sessionStorage.removeItem(KEY_ALERT_DISMISSED);
+      window.__anki_timer_alert_dismissed = '';
     } catch(err) {}
     hideTimerToast();
     var textEl = document.getElementById('bottom-time-display');
@@ -728,6 +754,7 @@ if (typeof playExampleAudio === 'undefined') {
 
   window.resetStudySession = function(e) {
     if (e) { e.stopPropagation(); e.preventDefault(); }
+    dismissedEndTime = 0;
     try {
       localStorage.removeItem(KEY_END);
       localStorage.removeItem(KEY_TOTAL);
@@ -735,6 +762,7 @@ if (typeof playExampleAudio === 'undefined') {
       sessionStorage.removeItem(KEY_END);
       sessionStorage.removeItem(KEY_TOTAL);
       sessionStorage.removeItem(KEY_ALERT_DISMISSED);
+      window.__anki_timer_alert_dismissed = '';
     } catch(err) {}
     session = initSession();
     hideTimerToast();

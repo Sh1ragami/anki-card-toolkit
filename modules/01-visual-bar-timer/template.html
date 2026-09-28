@@ -12,15 +12,16 @@
   </div>
 </div>
 
-<!-- Timer Finish Toast Banner -->
-<div id="timer-finish-toast" class="timer-finish-toast" onclick="window.dismissTimerToast(event)" style="display: none;">
-  <div class="toast-icon">⏰</div>
-  <div class="toast-body">
-    <div class="toast-title">TIME UP!</div>
+<!-- Timer Finish Notification Banner (Deck-Harmonized Design) -->
+<div id="timer-finish-toast" class="timer-finish-toast" style="display: none;">
+  <div class="toast-content">
+    <div class="toast-title">⏳ SESSION COMPLETE</div>
     <div class="toast-desc">セッション終了・お疲れ様でした</div>
   </div>
-  <button type="button" class="toast-action-btn" onclick="window.startStudyBreak(5, event)" title="5分休憩をスタート">☕ 5分休憩</button>
-  <button type="button" class="toast-close-btn" onclick="window.dismissTimerToast(event)" title="閉じる">&times;</button>
+  <div class="toast-actions">
+    <button type="button" class="toast-break-btn" onclick="window.startStudyBreak(5, event)" ontouchstart="window.startStudyBreak(5, event)">☕ 5分休憩</button>
+    <button type="button" class="toast-close-btn" id="toast-close-btn" onclick="window.dismissTimerToast(event)" ontouchstart="window.dismissTimerToast(event)" title="閉じる" aria-label="閉じる">✕</button>
+  </div>
 </div>
 
 <!-- Timer Setting Dropdown Panel -->

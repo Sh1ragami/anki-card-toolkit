@@ -515,16 +515,21 @@ html.theme-dark .hud-alert-btn.active {
 }
 
 /* ============================================================
-   Timer Finished Notice (Toast Banner & Display Pulse)
+   Timer Finished Notice (Deck-Harmonized Design)
    ============================================================ */
 #bottom-time-display.timer-finished {
-  color: #ff3838 !important;
-  animation: timerTimePulse 1s ease-in-out infinite alternate !important;
+  color: #991b1b !important;
+  animation: timerTimePulse 1.2s ease-in-out infinite alternate !important;
+}
+
+.theme-dark #bottom-time-display.timer-finished,
+html.theme-dark #bottom-time-display.timer-finished {
+  color: #ff7b72 !important;
 }
 
 @keyframes timerTimePulse {
   0% { transform: scale(1); opacity: 0.85; }
-  100% { transform: scale(1.08); opacity: 1; text-shadow: 0 0 6px rgba(255, 56, 56, 0.5); }
+  100% { transform: scale(1.08); opacity: 1; text-shadow: 0 0 6px rgba(153, 27, 27, 0.35); }
 }
 
 .timer-finish-toast {
@@ -535,25 +540,30 @@ html.theme-dark .hud-alert-btn.active {
   z-index: 1000005 !important;
   display: flex !important;
   align-items: center !important;
+  justify-content: space-between !important;
   gap: 10px !important;
-  padding: 8px 14px !important;
-  border-radius: 30px !important;
-  background: rgba(255, 255, 255, 0.98) !important;
-  color: #1a221b !important;
-  border: 1.5px solid #ff4757 !important;
-  box-shadow: 0 6px 20px rgba(255, 71, 87, 0.25), 0 2px 8px rgba(0, 0, 0, 0.12) !important;
-  cursor: pointer !important;
+  width: calc(100% - 32px) !important;
+  max-width: 480px !important;
+  padding: 8px 10px 8px 14px !important;
+  border-radius: 8px !important;
+  background: rgba(245, 247, 242, 0.98) !important;
+  color: #141f17 !important;
+  border: 1px solid rgba(72, 89, 75, 0.3) !important;
+  border-left: 4px solid #991b1b !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16) !important;
+  box-sizing: border-box !important;
+  pointer-events: auto !important;
   user-select: none !important;
   -webkit-user-select: none !important;
-  animation: toastSlideDown 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
-  max-width: 90vw !important;
-  box-sizing: border-box !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  animation: toastSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
 @keyframes toastSlideDown {
   from {
     opacity: 0;
-    transform: translate(-50%, -20px) scale(0.95);
+    transform: translate(-50%, -16px) scale(0.97);
   }
   to {
     opacity: 1;
@@ -561,110 +571,135 @@ html.theme-dark .hud-alert-btn.active {
   }
 }
 
-.timer-finish-toast .toast-icon {
-  font-size: 20px !important;
-  line-height: 1 !important;
-  animation: toastIconShake 1.2s ease-in-out infinite !important;
-}
-
-@keyframes toastIconShake {
-  0%, 100% { transform: rotate(0deg); }
-  20%, 60% { transform: rotate(-12deg); }
-  40%, 80% { transform: rotate(12deg); }
-}
-
-.timer-finish-toast .toast-body {
+.timer-finish-toast .toast-content {
   display: flex !important;
   flex-direction: column !important;
   text-align: left !important;
+  min-width: 0 !important;
+  flex: 1 !important;
 }
 
 .timer-finish-toast .toast-title {
-  font-size: 13px !important;
-  font-weight: 800 !important;
-  color: #ff3838 !important;
-  letter-spacing: 0.5px !important;
-  line-height: 1.2 !important;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  color: #991b1b !important;
+  line-height: 1.3 !important;
+  white-space: nowrap !important;
 }
 
 .timer-finish-toast .toast-desc {
-  font-size: 11px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
   color: #48594b !important;
-  line-height: 1.2 !important;
+  line-height: 1.3 !important;
   margin-top: 1px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-.timer-finish-toast .toast-action-btn {
-  background: #ff4757 !important;
-  color: #ffffff !important;
-  border: none !important;
-  border-radius: 12px !important;
+.timer-finish-toast .toast-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+}
+
+.timer-finish-toast .toast-break-btn {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(72, 89, 75, 0.3) !important;
+  border-radius: 4px !important;
   padding: 4px 8px !important;
   font-size: 11px !important;
-  font-weight: 700 !important;
+  font-weight: 600 !important;
+  color: #28362b !important;
   cursor: pointer !important;
   white-space: nowrap !important;
-  margin-left: 4px !important;
-  transition: opacity 0.15s ease !important;
+  line-height: 1.2 !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  transition: all 0.15s ease !important;
 }
 
-.timer-finish-toast .toast-action-btn:hover {
-  opacity: 0.9 !important;
+.timer-finish-toast .toast-break-btn:hover,
+.timer-finish-toast .toast-break-btn:active {
+  background: #1e2b20 !important;
+  color: #ffffff !important;
+  border-color: #1e2b20 !important;
 }
 
 .timer-finish-toast .toast-close-btn {
-  background: rgba(0, 0, 0, 0.06) !important;
+  background: transparent !important;
   border: none !important;
-  width: 22px !important;
-  height: 22px !important;
-  border-radius: 50% !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 4px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  font-size: 14px !important;
-  font-weight: bold !important;
-  color: #666666 !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #48594b !important;
   cursor: pointer !important;
-  margin-left: 2px !important;
   padding: 0 !important;
   line-height: 1 !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
-.timer-finish-toast .toast-close-btn:hover {
-  background: rgba(0, 0, 0, 0.12) !important;
-  color: #111111 !important;
+.timer-finish-toast .toast-close-btn:hover,
+.timer-finish-toast .toast-close-btn:active {
+  background: rgba(0, 0, 0, 0.08) !important;
+  color: #141f17 !important;
 }
 
-/* Dark Mode Toast */
+/* Dark Mode Harmonization */
 .theme-dark .timer-finish-toast,
 html.theme-dark .timer-finish-toast {
-  background: rgba(28, 28, 30, 0.96) !important;
-  color: #f5f5f7 !important;
-  border: 1.5px solid #ff4757 !important;
-  box-shadow: 0 6px 24px rgba(255, 71, 87, 0.35), 0 2px 10px rgba(0, 0, 0, 0.5) !important;
+  background: rgba(22, 26, 23, 0.98) !important;
+  color: #e6ede7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-left: 4px solid #ff7b72 !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6) !important;
 }
 
 .theme-dark .timer-finish-toast .toast-title,
 html.theme-dark .timer-finish-toast .toast-title {
-  color: #ff6b6b !important;
+  color: #ff7b72 !important;
 }
 
 .theme-dark .timer-finish-toast .toast-desc,
 html.theme-dark .timer-finish-toast .toast-desc {
-  color: #a0a0a5 !important;
+  color: #a3b3a5 !important;
 }
 
-.theme-dark .timer-finish-toast .toast-action-btn,
-html.theme-dark .timer-finish-toast .toast-action-btn {
-  background: #ff5555 !important;
-  color: #ffffff !important;
+.theme-dark .timer-finish-toast .toast-break-btn,
+html.theme-dark .timer-finish-toast .toast-break-btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #e6ede7 !important;
+}
+
+.theme-dark .timer-finish-toast .toast-break-btn:hover,
+.theme-dark .timer-finish-toast .toast-break-btn:active {
+  background: #30d158 !important;
+  color: #000000 !important;
+  border-color: #30d158 !important;
 }
 
 .theme-dark .timer-finish-toast .toast-close-btn,
 html.theme-dark .timer-finish-toast .toast-close-btn {
-  background: rgba(255, 255, 255, 0.15) !important;
-  color: #eeeeee !important;
+  color: #8a9a8c !important;
+}
+
+.theme-dark .timer-finish-toast .toast-close-btn:hover,
+.theme-dark .timer-finish-toast .toast-close-btn:active {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
 }
 
 /* Offset Toast when HUD is placed on Top */
