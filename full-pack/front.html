@@ -93,6 +93,14 @@ root.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', '
         <button type="button" class="hud-thick-btn" id="hud-thick-btn-huge" onclick="window.setHudThickness('huge', event)">極太</button>
       </div>
     </div>
+    <!-- Timer Alert Selector (ON / OFF) -->
+    <div class="timer-alert-bar" style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(72, 89, 75, 0.25);">
+      <div style="font-size: 10px; font-weight: 700; color: #48594b; margin-bottom: 4px;">🔔 終了時通知:</div>
+      <div style="display: flex; gap: 3px;">
+        <button type="button" class="hud-alert-btn" id="hud-alert-btn-on" onclick="window.setHudAlert(true, event)">ON (表示)</button>
+        <button type="button" class="hud-alert-btn" id="hud-alert-btn-off" onclick="window.setHudAlert(false, event)">OFF (なし)</button>
+      </div>
+    </div>
     <button type="button" class="timer-menu-btn reset" onclick="window.resetStudySession(event)">🔄 タイマーリセット</button>
   </div>
 
@@ -144,6 +152,17 @@ root.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', '
     </div>
     {{/Example_EN}}
   </div>
+</div>
+
+<!-- Timer Finish Toast Banner -->
+<div id="timer-finish-toast" class="timer-finish-toast" onclick="window.dismissTimerToast(event)" style="display: none;">
+  <div class="toast-icon">⏰</div>
+  <div class="toast-body">
+    <div class="toast-title">TIME UP!</div>
+    <div class="toast-desc">セッション終了・お疲れ様でした</div>
+  </div>
+  <button type="button" class="toast-action-btn" onclick="window.startStudyBreak(5, event)" title="5分休憩をスタート">☕ 5分休憩</button>
+  <button type="button" class="toast-close-btn" onclick="window.dismissTimerToast(event)" title="閉じる">&times;</button>
 </div>
 
 <!-- Screen Bottom HUD: Forecast + Timer + King Jim VBT20 4-Color Gradient Bar -->
@@ -204,6 +223,14 @@ root.classList.remove('hud-layout-top', 'hud-layout-left', 'hud-layout-right', '
       var clip = isVertical ? ('inset(' + (100 - pct) + '% 0 0 0)') : ('inset(0 ' + (100 - pct) + '% 0 0)');
       fEl.style.clipPath = clip;
       fEl.style.webkitClipPath = clip;
+    }
+
+    var alertOn = (localStorage.getItem('anki_hud_alert') || sessionStorage.getItem('anki_hud_alert')) !== 'off';
+    var dismissed = localStorage.getItem('anki_timer_alert_dismissed') || sessionStorage.getItem('anki_timer_alert_dismissed');
+    if (endTime > 0 && remSec <= 0 && alertOn && dismissed !== endTime.toString()) {
+      var toast = document.getElementById('timer-finish-toast');
+      if (toast) toast.style.display = 'flex';
+      if (tEl) tEl.classList.add('timer-finished');
     }
   } catch(e) {}
 })();
@@ -483,6 +510,86 @@ if (typeof playExampleAudio === 'undefined') {
     return false;
   };
 
+  var KEY_HUD_ALERT = 'anki_hud_alert'; // 'on' or 'off'
+  var KEY_ALERT_DISMISSED = 'anki_timer_alert_dismissed';
+
+  function getHudAlert() {
+    try {
+      var val = localStorage.getItem(KEY_HUD_ALERT) || sessionStorage.getItem(KEY_HUD_ALERT);
+      return val !== 'off';
+    } catch(e) {
+      return true;
+    }
+  }
+
+  function applyHudAlert(enabled) {
+    var btnOn = document.getElementById('hud-alert-btn-on');
+    var btnOff = document.getElementById('hud-alert-btn-off');
+    if (btnOn && btnOff) {
+      if (enabled) {
+        btnOn.classList.add('active');
+        btnOff.classList.remove('active');
+      } else {
+        btnOn.classList.remove('active');
+        btnOff.classList.add('active');
+      }
+    }
+    if (!enabled) {
+      hideTimerToast();
+      var textEl = document.getElementById('bottom-time-display');
+      if (textEl) textEl.classList.remove('timer-finished');
+    }
+  }
+
+  window.setHudAlert = function(enabled, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var val = enabled ? 'on' : 'off';
+    try { localStorage.setItem(KEY_HUD_ALERT, val); } catch(err) {}
+    try { sessionStorage.setItem(KEY_HUD_ALERT, val); } catch(err) {}
+    applyHudAlert(enabled);
+    tick();
+    return false;
+  };
+
+  function isAlertDismissed() {
+    try {
+      var dis = localStorage.getItem(KEY_ALERT_DISMISSED) || sessionStorage.getItem(KEY_ALERT_DISMISSED);
+      return dis === session.endTime.toString();
+    } catch(e) {
+      return false;
+    }
+  }
+
+  function showTimerToast() {
+    var toast = document.getElementById('timer-finish-toast');
+    if (toast && toast.style.display !== 'flex') {
+      toast.style.display = 'flex';
+    }
+  }
+
+  function hideTimerToast() {
+    var toast = document.getElementById('timer-finish-toast');
+    if (toast && toast.style.display !== 'none') {
+      toast.style.display = 'none';
+    }
+  }
+
+  window.dismissTimerToast = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    try {
+      localStorage.setItem(KEY_ALERT_DISMISSED, session.endTime.toString());
+      sessionStorage.setItem(KEY_ALERT_DISMISSED, session.endTime.toString());
+    } catch(err) {}
+    hideTimerToast();
+    return false;
+  };
+
+  window.startStudyBreak = function(mins, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    window.startStudySession(mins || 5, e);
+    window.dismissTimerToast(e);
+    return false;
+  };
 
   function setBarProgress(ratio) {
     var bar = document.getElementById('screen-bottom-bar-fill');
@@ -513,6 +620,21 @@ if (typeof playExampleAudio === 'undefined') {
       }
     }
 
+    var isFinished = (session.endTime > 0 && remainingMs <= 0);
+    var alertEnabled = getHudAlert();
+
+    if (isFinished && alertEnabled) {
+      if (textEl) textEl.classList.add('timer-finished');
+      if (!isAlertDismissed()) {
+        showTimerToast();
+      } else {
+        hideTimerToast();
+      }
+    } else {
+      if (textEl) textEl.classList.remove('timer-finished');
+      hideTimerToast();
+    }
+
     // 2. Bottom Progress Bar
     if (mode === 'card') {
       var elapsed = now - cardStartTime;
@@ -526,6 +648,7 @@ if (typeof playExampleAudio === 'undefined') {
 
   applyHudPosition(getHudPosition());
   applyHudThickness(getHudThickness());
+  applyHudAlert(getHudAlert());
   tick();
   updateBarModeUI();
 
@@ -545,6 +668,8 @@ if (typeof playExampleAudio === 'undefined') {
     if (!menu) return false;
     updateBarModeUI();
     applyHudPosition(getHudPosition());
+    applyHudThickness(getHudThickness());
+    applyHudAlert(getHudAlert());
     menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
     return false;
   };
@@ -554,8 +679,17 @@ if (typeof playExampleAudio === 'undefined') {
     var totalMs = mins * 60 * 1000;
     session.totalMs = totalMs;
     session.endTime = Date.now() + totalMs;
-    localStorage.setItem(KEY_END, session.endTime.toString());
-    localStorage.setItem(KEY_TOTAL, totalMs.toString());
+    try {
+      localStorage.setItem(KEY_END, session.endTime.toString());
+      localStorage.setItem(KEY_TOTAL, totalMs.toString());
+      sessionStorage.setItem(KEY_END, session.endTime.toString());
+      sessionStorage.setItem(KEY_TOTAL, totalMs.toString());
+      localStorage.removeItem(KEY_ALERT_DISMISSED);
+      sessionStorage.removeItem(KEY_ALERT_DISMISSED);
+    } catch(err) {}
+    hideTimerToast();
+    var textEl = document.getElementById('bottom-time-display');
+    if (textEl) textEl.classList.remove('timer-finished');
     tick();
     var menu = document.getElementById('hdr-timer-panel');
     if (menu) menu.style.display = 'none';
@@ -564,9 +698,18 @@ if (typeof playExampleAudio === 'undefined') {
 
   window.resetStudySession = function(e) {
     if (e) { e.stopPropagation(); e.preventDefault(); }
-    localStorage.removeItem(KEY_END);
-    localStorage.removeItem(KEY_TOTAL);
+    try {
+      localStorage.removeItem(KEY_END);
+      localStorage.removeItem(KEY_TOTAL);
+      localStorage.removeItem(KEY_ALERT_DISMISSED);
+      sessionStorage.removeItem(KEY_END);
+      sessionStorage.removeItem(KEY_TOTAL);
+      sessionStorage.removeItem(KEY_ALERT_DISMISSED);
+    } catch(err) {}
     session = initSession();
+    hideTimerToast();
+    var textEl = document.getElementById('bottom-time-display');
+    if (textEl) textEl.classList.remove('timer-finished');
     tick();
     var menu = document.getElementById('hdr-timer-panel');
     if (menu) menu.style.display = 'none';

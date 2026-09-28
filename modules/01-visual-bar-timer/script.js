@@ -124,6 +124,87 @@
     return false;
   };
 
+  var KEY_HUD_ALERT = 'anki_hud_alert'; // 'on' or 'off'
+  var KEY_ALERT_DISMISSED = 'anki_timer_alert_dismissed';
+
+  function getHudAlert() {
+    try {
+      var val = localStorage.getItem(KEY_HUD_ALERT) || sessionStorage.getItem(KEY_HUD_ALERT);
+      return val !== 'off';
+    } catch(e) {
+      return true;
+    }
+  }
+
+  function applyHudAlert(enabled) {
+    var btnOn = document.getElementById('hud-alert-btn-on');
+    var btnOff = document.getElementById('hud-alert-btn-off');
+    if (btnOn && btnOff) {
+      if (enabled) {
+        btnOn.classList.add('active');
+        btnOff.classList.remove('active');
+      } else {
+        btnOn.classList.remove('active');
+        btnOff.classList.add('active');
+      }
+    }
+    if (!enabled) {
+      hideTimerToast();
+      var textEl = document.getElementById('bottom-time-display');
+      if (textEl) textEl.classList.remove('timer-finished');
+    }
+  }
+
+  window.setHudAlert = function(enabled, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    var val = enabled ? 'on' : 'off';
+    try { localStorage.setItem(KEY_HUD_ALERT, val); } catch(err) {}
+    try { sessionStorage.setItem(KEY_HUD_ALERT, val); } catch(err) {}
+    applyHudAlert(enabled);
+    tick();
+    return false;
+  };
+
+  function isAlertDismissed() {
+    try {
+      var dis = localStorage.getItem(KEY_ALERT_DISMISSED) || sessionStorage.getItem(KEY_ALERT_DISMISSED);
+      return dis === session.endTime.toString();
+    } catch(e) {
+      return false;
+    }
+  }
+
+  function showTimerToast() {
+    var toast = document.getElementById('timer-finish-toast');
+    if (toast && toast.style.display !== 'flex') {
+      toast.style.display = 'flex';
+    }
+  }
+
+  function hideTimerToast() {
+    var toast = document.getElementById('timer-finish-toast');
+    if (toast && toast.style.display !== 'none') {
+      toast.style.display = 'none';
+    }
+  }
+
+  window.dismissTimerToast = function(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    try {
+      localStorage.setItem(KEY_ALERT_DISMISSED, session.endTime.toString());
+      sessionStorage.setItem(KEY_ALERT_DISMISSED, session.endTime.toString());
+    } catch(err) {}
+    hideTimerToast();
+    return false;
+  };
+
+  window.startStudyBreak = function(mins, e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    window.startStudySession(mins || 5, e);
+    window.dismissTimerToast(e);
+    return false;
+  };
+
   function setBarProgress(ratio) {
     var bar = document.getElementById('screen-bottom-bar-fill');
     if (!bar) return;
@@ -148,6 +229,21 @@
       textEl.textContent = (remainingSec <= 0) ? '00:00' : formatMinSec(remainingSec);
     }
 
+    var isFinished = (session.endTime > 0 && remainingMs <= 0);
+    var alertEnabled = getHudAlert();
+
+    if (isFinished && alertEnabled) {
+      if (textEl) textEl.classList.add('timer-finished');
+      if (!isAlertDismissed()) {
+        showTimerToast();
+      } else {
+        hideTimerToast();
+      }
+    } else {
+      if (textEl) textEl.classList.remove('timer-finished');
+      hideTimerToast();
+    }
+
     if (mode === 'card') {
       var elapsed = now - cardStartTime;
       var cardRemaining = Math.max(0, CARD_DURATION_MS - elapsed);
@@ -160,6 +256,7 @@
 
   applyHudPosition(getHudPosition());
   applyHudThickness(getHudThickness());
+  applyHudAlert(getHudAlert());
   tick();
   updateBarModeUI();
 
@@ -174,6 +271,9 @@
     var menu = document.getElementById('hdr-timer-panel');
     if (!menu) return false;
     updateBarModeUI();
+    applyHudPosition(getHudPosition());
+    applyHudThickness(getHudThickness());
+    applyHudAlert(getHudAlert());
     menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
     return false;
   };
@@ -183,8 +283,17 @@
     var totalMs = mins * 60 * 1000;
     session.totalMs = totalMs;
     session.endTime = Date.now() + totalMs;
-    localStorage.setItem(KEY_END, session.endTime.toString());
-    localStorage.setItem(KEY_TOTAL, totalMs.toString());
+    try {
+      localStorage.setItem(KEY_END, session.endTime.toString());
+      localStorage.setItem(KEY_TOTAL, totalMs.toString());
+      sessionStorage.setItem(KEY_END, session.endTime.toString());
+      sessionStorage.setItem(KEY_TOTAL, totalMs.toString());
+      localStorage.removeItem(KEY_ALERT_DISMISSED);
+      sessionStorage.removeItem(KEY_ALERT_DISMISSED);
+    } catch(err) {}
+    hideTimerToast();
+    var textEl = document.getElementById('bottom-time-display');
+    if (textEl) textEl.classList.remove('timer-finished');
     tick();
     var menu = document.getElementById('hdr-timer-panel');
     if (menu) menu.style.display = 'none';
@@ -193,9 +302,18 @@
 
   window.resetStudySession = function(e) {
     if (e) { e.stopPropagation(); e.preventDefault(); }
-    localStorage.removeItem(KEY_END);
-    localStorage.removeItem(KEY_TOTAL);
+    try {
+      localStorage.removeItem(KEY_END);
+      localStorage.removeItem(KEY_TOTAL);
+      localStorage.removeItem(KEY_ALERT_DISMISSED);
+      sessionStorage.removeItem(KEY_END);
+      sessionStorage.removeItem(KEY_TOTAL);
+      sessionStorage.removeItem(KEY_ALERT_DISMISSED);
+    } catch(err) {}
     session = initSession();
+    hideTimerToast();
+    var textEl = document.getElementById('bottom-time-display');
+    if (textEl) textEl.classList.remove('timer-finished');
     tick();
     var menu = document.getElementById('hdr-timer-panel');
     if (menu) menu.style.display = 'none';

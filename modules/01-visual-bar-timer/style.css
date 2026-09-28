@@ -476,3 +476,210 @@ body.hud-layout-top #hdr-prediction-panel {
 .hud-thick-huge.hud-layout-left .card-box, html.hud-thick-huge.hud-layout-left .card-box { padding-left: 46px !important; }
 .hud-thick-huge.hud-layout-right .card-box, html.hud-thick-huge.hud-layout-right .card-box { padding-right: 46px !important; }
 .hud-thick-huge.hud-layout-top .card-box, html.hud-thick-huge.hud-layout-top .card-box { padding-top: 76px !important; }
+
+/* Timer Alert Buttons */
+.hud-alert-btn {
+  flex: 1 !important;
+  padding: 3px 2px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  border-radius: 3px !important;
+  border: 1px solid rgba(72, 89, 75, 0.28) !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #48594b !important;
+  text-align: center !important;
+  transition: all 0.15s ease !important;
+}
+
+.hud-alert-btn.active {
+  background: #1e2b20 !important;
+  color: #ffffff !important;
+  border-color: #1e2b20 !important;
+  font-weight: 700 !important;
+}
+
+.theme-dark .hud-alert-btn,
+html.theme-dark .hud-alert-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #a3a3a3 !important;
+}
+
+.theme-dark .hud-alert-btn.active,
+html.theme-dark .hud-alert-btn.active {
+  background: #ff5555 !important;
+  color: #ffffff !important;
+  border-color: #ff5555 !important;
+  font-weight: 700 !important;
+}
+
+/* ============================================================
+   Timer Finished Notice (Toast Banner & Display Pulse)
+   ============================================================ */
+#bottom-time-display.timer-finished {
+  color: #ff3838 !important;
+  animation: timerTimePulse 1s ease-in-out infinite alternate !important;
+}
+
+@keyframes timerTimePulse {
+  0% { transform: scale(1); opacity: 0.85; }
+  100% { transform: scale(1.08); opacity: 1; text-shadow: 0 0 6px rgba(255, 56, 56, 0.5); }
+}
+
+.timer-finish-toast {
+  position: fixed !important;
+  top: 14px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 1000005 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 8px 14px !important;
+  border-radius: 30px !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  color: #1a221b !important;
+  border: 1.5px solid #ff4757 !important;
+  box-shadow: 0 6px 20px rgba(255, 71, 87, 0.25), 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  animation: toastSlideDown 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+  max-width: 90vw !important;
+  box-sizing: border-box !important;
+}
+
+@keyframes toastSlideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.timer-finish-toast .toast-icon {
+  font-size: 20px !important;
+  line-height: 1 !important;
+  animation: toastIconShake 1.2s ease-in-out infinite !important;
+}
+
+@keyframes toastIconShake {
+  0%, 100% { transform: rotate(0deg); }
+  20%, 60% { transform: rotate(-12deg); }
+  40%, 80% { transform: rotate(12deg); }
+}
+
+.timer-finish-toast .toast-body {
+  display: flex !important;
+  flex-direction: column !important;
+  text-align: left !important;
+}
+
+.timer-finish-toast .toast-title {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #ff3838 !important;
+  letter-spacing: 0.5px !important;
+  line-height: 1.2 !important;
+}
+
+.timer-finish-toast .toast-desc {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #48594b !important;
+  line-height: 1.2 !important;
+  margin-top: 1px !important;
+}
+
+.timer-finish-toast .toast-action-btn {
+  background: #ff4757 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  margin-left: 4px !important;
+  transition: opacity 0.15s ease !important;
+}
+
+.timer-finish-toast .toast-action-btn:hover {
+  opacity: 0.9 !important;
+}
+
+.timer-finish-toast .toast-close-btn {
+  background: rgba(0, 0, 0, 0.06) !important;
+  border: none !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  color: #666666 !important;
+  cursor: pointer !important;
+  margin-left: 2px !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.timer-finish-toast .toast-close-btn:hover {
+  background: rgba(0, 0, 0, 0.12) !important;
+  color: #111111 !important;
+}
+
+/* Dark Mode Toast */
+.theme-dark .timer-finish-toast,
+html.theme-dark .timer-finish-toast {
+  background: rgba(28, 28, 30, 0.96) !important;
+  color: #f5f5f7 !important;
+  border: 1.5px solid #ff4757 !important;
+  box-shadow: 0 6px 24px rgba(255, 71, 87, 0.35), 0 2px 10px rgba(0, 0, 0, 0.5) !important;
+}
+
+.theme-dark .timer-finish-toast .toast-title,
+html.theme-dark .timer-finish-toast .toast-title {
+  color: #ff6b6b !important;
+}
+
+.theme-dark .timer-finish-toast .toast-desc,
+html.theme-dark .timer-finish-toast .toast-desc {
+  color: #a0a0a5 !important;
+}
+
+.theme-dark .timer-finish-toast .toast-action-btn,
+html.theme-dark .timer-finish-toast .toast-action-btn {
+  background: #ff5555 !important;
+  color: #ffffff !important;
+}
+
+.theme-dark .timer-finish-toast .toast-close-btn,
+html.theme-dark .timer-finish-toast .toast-close-btn {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #eeeeee !important;
+}
+
+/* Offset Toast when HUD is placed on Top */
+.hud-layout-top .timer-finish-toast,
+html.hud-layout-top .timer-finish-toast {
+  top: 36px !important;
+}
+
+.hud-thick-thick.hud-layout-top .timer-finish-toast,
+html.hud-thick-thick.hud-layout-top .timer-finish-toast {
+  top: 44px !important;
+}
+
+.hud-thick-huge.hud-layout-top .timer-finish-toast,
+html.hud-thick-huge.hud-layout-top .timer-finish-toast {
+  top: 54px !important;
+}
+

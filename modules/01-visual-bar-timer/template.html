@@ -12,6 +12,17 @@
   </div>
 </div>
 
+<!-- Timer Finish Toast Banner -->
+<div id="timer-finish-toast" class="timer-finish-toast" onclick="window.dismissTimerToast(event)" style="display: none;">
+  <div class="toast-icon">⏰</div>
+  <div class="toast-body">
+    <div class="toast-title">TIME UP!</div>
+    <div class="toast-desc">セッション終了・お疲れ様でした</div>
+  </div>
+  <button type="button" class="toast-action-btn" onclick="window.startStudyBreak(5, event)" title="5分休憩をスタート">☕ 5分休憩</button>
+  <button type="button" class="toast-close-btn" onclick="window.dismissTimerToast(event)" title="閉じる">&times;</button>
+</div>
+
 <!-- Timer Setting Dropdown Panel -->
 <div class="hdr-dropdown-panel" id="hdr-timer-panel" onclick="event.stopPropagation()">
   <div class="dropdown-header">
@@ -40,6 +51,14 @@
       <button type="button" class="hud-thick-btn" id="hud-thick-btn-normal" onclick="window.setHudThickness('normal', event)">標準</button>
       <button type="button" class="hud-thick-btn" id="hud-thick-btn-thick" onclick="window.setHudThickness('thick', event)">太め</button>
       <button type="button" class="hud-thick-btn" id="hud-thick-btn-huge" onclick="window.setHudThickness('huge', event)">極太</button>
+    </div>
+  </div>
+  <!-- Timer Alert Selector (ON / OFF) -->
+  <div class="timer-alert-bar" style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(72, 89, 75, 0.25);">
+    <div style="font-size: 10px; font-weight: 700; color: #48594b; margin-bottom: 4px;">🔔 終了時通知:</div>
+    <div style="display: flex; gap: 3px;">
+      <button type="button" class="hud-alert-btn" id="hud-alert-btn-on" onclick="window.setHudAlert(true, event)">ON (表示)</button>
+      <button type="button" class="hud-alert-btn" id="hud-alert-btn-off" onclick="window.setHudAlert(false, event)">OFF (なし)</button>
     </div>
   </div>
   <button type="button" class="timer-menu-btn reset" onclick="window.resetStudySession(event)">🔄 タイマーリセット</button>
@@ -75,6 +94,14 @@
       var clip = 'inset(0 ' + (100 - pct) + '% 0 0)';
       fEl.style.clipPath = clip;
       fEl.style.webkitClipPath = clip;
+    }
+
+    var alertOn = (localStorage.getItem('anki_hud_alert') || sessionStorage.getItem('anki_hud_alert')) !== 'off';
+    var dismissed = localStorage.getItem('anki_timer_alert_dismissed') || sessionStorage.getItem('anki_timer_alert_dismissed');
+    if (endTime > 0 && remSec <= 0 && alertOn && dismissed !== endTime.toString()) {
+      var toast = document.getElementById('timer-finish-toast');
+      if (toast) toast.style.display = 'flex';
+      if (tEl) tEl.classList.add('timer-finished');
     }
   } catch(e) {}
 })();
