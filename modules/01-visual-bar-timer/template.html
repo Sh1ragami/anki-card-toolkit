@@ -66,6 +66,33 @@
 </div>
 
 <script>
+/* Persistent HUD Setup - Moves HUD out of Anki's #qa to prevent flickering on card flip */
+(function() {
+  try {
+    var qa = document.getElementById('qa');
+    if (!qa) return;
+    var hudIds = ['screen-bottom-hud', 'timer-finish-toast', 'hdr-timer-panel', 'hdr-prediction-panel', 'hdr-stock-panel'];
+    for (var i = 0; i < hudIds.length; i++) {
+      var id = hudIds[i];
+      var els = document.querySelectorAll('#' + id);
+      var persistentEl = null;
+      var newElInQa = null;
+      for (var j = 0; j < els.length; j++) {
+        if (qa.contains(els[j])) {
+          newElInQa = els[j];
+        } else if (document.body.contains(els[j])) {
+          persistentEl = els[j];
+        }
+      }
+      if (newElInQa && persistentEl) {
+        newElInQa.parentNode.removeChild(newElInQa);
+      } else if (newElInQa && !persistentEl) {
+        document.body.appendChild(newElInQa);
+      }
+    }
+  } catch(e) {}
+})();
+
 /* Synchronous Instant Paint - Eliminates any card-flip flickering */
 (function() {
   try {
