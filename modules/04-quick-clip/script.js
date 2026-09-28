@@ -108,36 +108,36 @@
     };
 
     var fallbackCopy = function() {
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.top = '0';
-      ta.style.left = '0';
-      ta.style.width = '2em';
-      ta.style.height = '2em';
-      ta.style.padding = '0';
-      ta.style.border = 'none';
-      ta.style.outline = 'none';
-      ta.style.boxShadow = 'none';
-      ta.style.background = 'transparent';
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      try { ta.setSelectionRange(0, 99999); } catch(err) {}
+      var div = document.createElement('div');
+      div.textContent = text;
+      div.style.position = 'fixed';
+      div.style.left = '-9999px';
+      div.style.whiteSpace = 'pre-wrap';
+      document.body.appendChild(div);
+
+      var sel = window.getSelection();
+      var range = document.createRange();
+      range.selectNodeContents(div);
+      sel.removeAllRanges();
+      sel.addRange(range);
+
+      var successful = false;
       try {
-        var successful = document.execCommand('copy');
-        if (successful) successCb();
-        else failCb();
-      } catch (err) {
-        failCb();
-      }
-      document.body.removeChild(ta);
+        successful = document.execCommand('copy');
+      } catch (err) {}
+      
+      sel.removeAllRanges();
+      document.body.removeChild(div);
+      return successful;
     };
 
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(successCb).catch(fallbackCopy);
+    // Try synchronous execCommand FIRST because it requires immediate user gesture context
+    if (fallbackCopy()) {
+      successCb();
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(successCb).catch(failCb);
     } else {
-      fallbackCopy();
+      failCb();
     }
     return false;
   };
