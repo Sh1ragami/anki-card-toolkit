@@ -235,29 +235,33 @@
         if (bMatch) {
           var pre = v.substring(0, bMatch.index);
           var post = v.substring(bMatch.index + bMatch[0].length);
-          var preBase = pre.replace(/[はにをがへとでからより]+$/, '');
           var opts = bMatch[1].split(/[・,]/);
           opts.forEach(function(opt) {
             var o = opt.trim();
             forms.push(pre + o + post);
-            if (preBase && preBase !== pre) forms.push(preBase + o + post);
-            
-            // Treat the option itself as a standalone candidate
+            forms.push(o + post);
             forms.push(o);
-            if (post) forms.push(o + post);
             
-            // Try to combine with the preceding particle (e.g. "を" in "…をコーチ[指導]する")
-            var particleMatch = pre.match(/([はにをがへとでからより])[^はにをがへとでからより]*$/);
-            if (particleMatch) {
-              forms.push(particleMatch[1] + o + post);
+            // Replace previous word after particle (e.g. 8番目の[もの] -> 8番目のもの, 反対の[こと] -> 反対のこと)
+            var pMatch = pre.match(/^(.*?)([はにをがへとでからよりの])([^はにをがへとでからよりの]+)$/);
+            if (pMatch) {
+              forms.push(pMatch[1] + pMatch[2] + o + post);
             }
           });
           forms.push(pre + post);
-          if (preBase && preBase !== pre) forms.push(preBase + post);
         } else {
           forms.push(v);
-          var strippedP = v.replace(/[はにをがへとでからより]+$/, '');
+          var strippedP = v.replace(/[はにをがへとでからよりの]+$/, '');
           if (strippedP && strippedP !== v) forms.push(strippedP);
+        }
+
+        // Also split on ellipsis/tilde (e.g. どんなに…でも -> どんなに)
+        if (v.indexOf('…') !== -1 || v.indexOf('〜') !== -1) {
+          var subParts = v.split(/[…〜]+/);
+          subParts.forEach(function(sp) {
+            var spClean = sp.trim();
+            if (spClean.length >= 2) forms.push(spClean);
+          });
         }
       });
 
@@ -277,6 +281,14 @@
         }
       });
     }
+
+    // Filter out short generic words like "もの", "こと", "ひと" if longer compounds containing them exist
+    allCands = allCands.filter(function(cand) {
+      if ((cand === 'もの' || cand === 'こと' || cand === 'ひと') && allCands.some(function(c) { return c.length > 2 && c.indexOf(cand) !== -1; })) {
+        return false;
+      }
+      return true;
+    });
 
     allCands.sort(function(a, b) { return b.length - a.length; });
 
