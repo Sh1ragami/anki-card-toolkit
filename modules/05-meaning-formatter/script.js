@@ -267,18 +267,40 @@
 
       forms.forEach(function(f) {
         var c = f.replace(/^[…‥\.\s〜～~]+|[…‥\.\s〜～~]+$/g, '').trim();
-        if (c && allCands.indexOf(c) === -1) {
-          allCands.push(c);
-          getVerbForms(c).forEach(function(vf) {
-            if (allCands.indexOf(vf) === -1) allCands.push(vf);
-          });
-          if (c.length >= 3 && c.endsWith('い')) {
-            var stem = c.slice(0, -1);
-            if (allCands.indexOf(stem) === -1) allCands.push(stem);
-          }
-          if (c === 'へ' && allCands.indexOf('ヘ') === -1) allCands.push('ヘ');
-          if (c === 'ヘ' && allCands.indexOf('へ') === -1) allCands.push('へ');
+        if (!c) return;
+
+        var variants = [c];
+        // Strip leading particles (e.g. を変える -> 変える, に尋ねる -> 尋ねる)
+        var noLeadP = c.replace(/^[をにへとでからよりが]\s*/, '').trim();
+        if (noLeadP && noLeadP !== c) variants.push(noLeadP);
+
+        // Strip plural / suffix (e.g. 子どもたち -> 子ども)
+        var noPlural = c.replace(/(たち|ら|がた)$/, '').trim();
+        if (noPlural && noPlural !== c) variants.push(noPlural);
+
+        // Convert -み noun to -む verb (e.g. 楽しみ -> 楽しむ)
+        if (c.endsWith('み') && c.length >= 3) {
+          variants.push(c.slice(0, -1) + 'む');
         }
+
+        variants.forEach(function(vItem) {
+          if (allCands.indexOf(vItem) === -1) {
+            allCands.push(vItem);
+            getVerbForms(vItem).forEach(function(vf) {
+              if (allCands.indexOf(vf) === -1) allCands.push(vf);
+            });
+            if (vItem.length >= 3 && vItem.endsWith('い')) {
+              var stem = vItem.slice(0, -1);
+              if (allCands.indexOf(stem) === -1) allCands.push(stem);
+            }
+            if (vItem.length >= 3 && vItem.endsWith('だ')) {
+              var stem = vItem.slice(0, -1);
+              if (allCands.indexOf(stem) === -1) allCands.push(stem);
+            }
+            if (vItem === 'へ' && allCands.indexOf('ヘ') === -1) allCands.push('ヘ');
+            if (vItem === 'ヘ' && allCands.indexOf('へ') === -1) allCands.push('へ');
+          }
+        });
       });
     }
 
