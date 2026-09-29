@@ -241,6 +241,16 @@
             var o = opt.trim();
             forms.push(pre + o + post);
             if (preBase && preBase !== pre) forms.push(preBase + o + post);
+            
+            // Treat the option itself as a standalone candidate
+            forms.push(o);
+            if (post) forms.push(o + post);
+            
+            // Try to combine with the preceding particle (e.g. "を" in "…をコーチ[指導]する")
+            var particleMatch = pre.match(/([はにをがへとでからより])[^はにをがへとでからより]*$/);
+            if (particleMatch) {
+              forms.push(particleMatch[1] + o + post);
+            }
           });
           forms.push(pre + post);
           if (preBase && preBase !== pre) forms.push(preBase + post);
